@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ziks - Physics Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body data-theme="dark">
+    <nav>
+        <div class="nav-left">
+            <div class="logo">
+                <i class="fa-solid fa-gear"></i>
+                <span>Ziks</span>
+            </div>
+        </div>
+        <div class="nav-center">
+            <a href="/projectile" class="nav-link">
+                <i class="fa-solid fa-rocket"></i>
+                Projectile Motion
+            </a>
+            <a href="/force" class="nav-link">
+                <i class="fa-solid fa-arrows-left-right"></i>
+                Force Engine
+            </a>
+            <a href="/pendulum" class="nav-link">
+                <i class="fa-solid fa-clock"></i>
+                Pendulum
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="hero">
+        <h1>Ziks Engine</h1>
+        <p>A physics simulator made for the Axiom YSWS visualize physics stuff using various simulations</p>
+        
+        <div class="hero-links">
+            <a href="https://axiom.hackclub.com/" target="_blank" class="hero-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                Axiom YSWS
+            </a>
+            <a href="https://github.com/Rexaintreal/Ziks" target="_blank" class="hero-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                </svg>
+                GitHub
+            </a>
+            <a href="https://saurabhcodesawfully.pythonanywhere.com/" target="_blank" class="hero-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Portfolio
+            </a>
+        </div>
+    </div>
+
+    <div class="cards">
+        <a href="/projectile" class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 20 L21 4" stroke-linecap="round"/>
+                    <circle cx="21" cy="4" r="2"/>
+                    <path d="M8 12 Q12 8 16 12" stroke-dasharray="2,2"/>
+                </svg>
+            </div>
+            <h3>Projectile Motion</h3>
+            <p>Change the angles, speed, and gravity to see how far your object can fly. Simple but oddly fun</p>
+        </a>
+
+        <a href="/force" class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <rect x="8" y="9" width="8" height="6" rx="1"/>
+                    <path d="M16 12 L22 12 M22 12 L20 10 M22 12 L20 14" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12 L8 12 M2 12 L4 10 M2 12 L4 14" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h3>Force Engine</h3>
+            <p>Push, pull, and play with forces to see how stuff react to forces. Basically, All Newton’s laws in action</p>
+        </a>
+
+        <a href="/pendulum" class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <line x1="12" y1="2" x2="12" y2="16" stroke-linecap="round"/>
+                    <circle cx="12" cy="2" r="1.5"/>
+                    <circle cx="12" cy="18" r="3"/>
+                    <path d="M9 18 A8 8 0 0 1 15 18" stroke-dasharray="2,2"/>
+                </svg>
+            </div>
+            <h3>Pendulum Engine</h3>
+            <p>A swinging ball in the air! Change length, gravity, and see how time period reacts.</p>
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
