@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendulum Simulator - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pendulum.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Pendulum... (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Pendulum Simulator</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Angle Unit</label>
+                <select id="angleUnit">
+                    <option value="degrees">Degrees (°)</option>
+                    <option value="radians">Radians (rad)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Initial Angle</label>
+                <div class="slider-container">
+                    <input type="range" id="angle" min="-180" max="180" value="30" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-angle-up angle-icon"></i>
+                    <span class="angle-value" id="angleDisplay">30°</span>
+                </div>
+                <div class="angle-visual">
+                    <svg class="angle-arc" id="angleArc" viewBox="0 0 80 80">
+                        <line x1="40" y1="40" x2="40" y2="10" stroke="var(--text-secondary)" stroke-width="1.5"/>
+                        <path id="anglePath" d="M 40 40 L 40 10" stroke="var(--text)" stroke-width="2" fill="none"/>
+                        <path id="angleArcPath" d="" stroke="var(--text-secondary)" stroke-width="1.5" fill="none" opacity="0.5"/>
+                        <circle cx="40" cy="40" r="2" fill="var(--text)"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Length (m)</label>
+                <input type="number" id="length" value="2" min="0.5" max="5" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Bob Mass (kg)</label>
+                <input type="number" id="mass" value="1" min="0.1" max="10" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Gravity (m/s²)</label>
+                <input type="number" id="gravity" value="9.8" min="0.1" max="20" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Damping Factor</label>
+                <input type="number" id="damping" value="0.999" min="0.95" max="1" step="0.001">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-play"></i> Start
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Physics Data</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Period (T)
+                    </span>
+                    <span class="stat-value" id="period">0 s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-wave-square"></i>
+                        Frequency (f)
+                    </span>
+                    <span class="stat-value" id="frequency">0 Hz</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-angle-up"></i>
+                        Current Angle
+                    </span>
+                    <span class="stat-value" id="currentAngle">0°</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-gauge"></i>
+                        Angular Velocity
+                    </span>
+                    <span class="stat-value" id="angularVelocity">0 rad/s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Energy
+                    </span>
+                    <span class="stat-value" id="energy">0 J</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Tip</h4>
+                <p>Click and drag the bob to set a custom starting position!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pendulum.js') }}"></script>
+</body>
+</html>
