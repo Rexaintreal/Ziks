@@ -18,5 +18,9 @@ def force():
 def pendulum():
     return render_template('pendulum.html')
 
+@app.route('/incline')
+def incline():
+    return render_template('incline.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
