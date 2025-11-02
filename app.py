@@ -26,5 +26,9 @@ def incline():
 def circular():
     return render_template('circular.html')
 
+@app.route('/spring')
+def spring():
+    return render_template('spring.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

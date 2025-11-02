@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring-Mass System - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spring.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Spring-Mass Simulator... ╰(*°▽°*)╯</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Spring-Mass System (SHM)</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Mass (kg)</label>
+                <input type="number" id="mass" value="2" min="0.1" max="10" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Spring Constant (N/m)</label>
+                <div class="slider-container">
+                    <input type="range" id="springConstant" min="10" max="200" value="50" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-spring"></i>
+                    <span class="spring-value" id="springDisplay">50 N/m</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Damping Coefficient (kg/s)</label>
+                <div class="slider-container">
+                    <input type="range" id="damping" min="0" max="5" value="0.5" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-wind"></i>
+                    <span class="damping-value" id="dampingDisplay">0.5 kg/s</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Gravity (m/s²)</label>
+                <input type="number" id="gravity" value="9.8" min="0" max="20" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Initial Displacement (m)</label>
+                <div class="slider-container">
+                    <input type="range" id="initialDisplacement" min="-2" max="2" value="1" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <span class="displacement-value" id="displacementDisplay">1.0 m</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showVectors" checked>
+                    <span>Show Force Vectors</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGraph" checked>
+                    <span>Show Energy Graph</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showEquilibrium" checked>
+                    <span>Show Equilibrium Line</span>
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-play"></i> Start
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>System Properties</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Period (T)
+                    </span>
+                    <span class="stat-value" id="period">0 s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-wave-square"></i>
+                        Frequency (f)
+                    </span>
+                    <span class="stat-value" id="frequency">0 Hz</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-ruler"></i>
+                        Displacement (x)
+                    </span>
+                    <span class="stat-value" id="displacement">0 m</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Velocity (v)
+                    </span>
+                    <span class="stat-value" id="velocity">0 m/s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-gauge"></i>
+                        Acceleration (a)
+                    </span>
+                    <span class="stat-value" id="acceleration">0 m/s²</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Total Energy (E)
+                    </span>
+                    <span class="stat-value" id="totalEnergy">0 J</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Physics Tips</h4>
+                <p><strong>Drag the mass</strong> to change initial displacement</p>
+                <p><strong>Period T = 2π√(m/k)</strong> - independent of amplitude!</p>
+                <p><strong>Damping</strong> causes energy loss over time</p>
+                <p><strong>At equilibrium</strong>, spring force equals weight</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/spring.js') }}"></script>
+</body>
+</html>
