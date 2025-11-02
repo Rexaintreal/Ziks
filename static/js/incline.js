@@ -4,7 +4,7 @@ const INCLINE_LENGTH = 600;
 const INCLINE_THICKNESS = 15;
 
 // State variables
-let angle = 30; // all the things are in SI (degrees) 
+let angle = 30; // all the thing are in SI (degrees) 
 let blocks = [{
     id: 1,
     mass: 5,
@@ -52,8 +52,6 @@ function resizeCanvas() {
 
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
-
-// Get controls
 const angleSlider = document.getElementById('angle');
 const angleDisplay = document.getElementById('angleDisplay');
 const massInput = document.getElementById('mass');
@@ -63,13 +61,11 @@ const addBlockBtn = document.getElementById('addBlockBtn');
 const addForceBtn = document.getElementById('addForceBtn');
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
-
 const zoomInBtn = document.getElementById('zoomInBtn');
 const zoomOutBtn = document.getElementById('zoomOutBtn');
 const resetViewBtn = document.getElementById('resetViewBtn');
 const zoomDisplay = document.getElementById('zoomDisplay');
 
-// Update angle display
 function updateAngleDisplay() {
     angle = parseFloat(angleSlider.value);
     angleDisplay.innerHTML = angle + "&deg;";
@@ -144,7 +140,6 @@ resetBtn.addEventListener('click', () => {
     draw();
 });
 
-// Zoom functions
 function updateZoomDisplay() {
     if (zoomDisplay) {
         zoomDisplay.textContent = `${Math.round(zoom * 100)}%`;
@@ -193,7 +188,7 @@ canvas.addEventListener('wheel', (e) => {
     setZoom(zoom * zoomFactor, mouseX, mouseY);
 });
 
-// Force management
+// functions for force management
 function addForce() {
     const forceId = Date.now();
     blocks[selectedBlock].appliedForces.push({
@@ -254,8 +249,6 @@ function updateForcesList() {
 // Make functions global
 window.removeForce = removeForce;
 window.updateForce = updateForce;
-
-// Mouse interaction
 canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left - panX) / zoom;
@@ -388,8 +381,6 @@ canvas.addEventListener('mousemove', (e) => {
     } else {
         let overForce = false;
         let overBlock = false;
-        
-        // Check blocks
         for (let block of blocks) {
             const blockPos = block.position;
             const blockLocalY = -INCLINE_THICKNESS - BLOCK_SIZE / 2;
@@ -403,8 +394,7 @@ canvas.addEventListener('mousemove', (e) => {
                 break;
             }
         }
-        
-        // Check forces if any
+        // check ig there any forces
         for (let block of blocks) {
             const blockPos = block.position;
             const blockLocalY = -INCLINE_THICKNESS - BLOCK_SIZE / 2;
@@ -438,21 +428,20 @@ canvas.addEventListener('mouseup', () => {
     canvas.style.cursor = zoom > 1 ? 'grab' : 'crosshair';
 });
 
+
+
 canvas.addEventListener('mouseleave', () => {
     isPanning = false;
     draggedBlock = null;
     draggedForce = null;
     canvas.style.cursor = 'crosshair';
 });
-
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-// Calculate forces
+// calculate forces
 function calculateForces() {
     const block = blocks[selectedBlock];
     const angleRad = angle * Math.PI / 180;
-    
-    // Weight force
     const weight = block.mass * gravity;
     
     // Components along the incline
@@ -462,18 +451,16 @@ function calculateForces() {
     // Normal force
     const normal = weightPerpendicular;
     
-    // Friction force opposing motion
+    // friction force opp motion
     const frictionForce = friction * normal;
     
-    // Applied forces components
+    // aplliedforce components
     let appliedParallel = 0;
     block.appliedForces.forEach(force => {
         const forceAngleRad = force.angle * Math.PI / 180;
-        // Project force onto incline direction
         appliedParallel += force.magnitude * Math.cos(forceAngleRad - angleRad);
     });
-    
-    // Net force along incline
+    //net force
     let netForce;
     if (block.velocity > 0.1) {
         // Moving up the incline
@@ -540,12 +527,8 @@ function draw() {
     ctx.save();
     ctx.translate(panX, panY);
     ctx.scale(zoom, zoom);
-    
-    // Clear canvas
     ctx.fillStyle = colors.bg;
     ctx.fillRect(-panX/zoom, -panY/zoom, canvas.width/zoom, canvas.height/zoom);
-    
-    // Draw grid pattern
     ctx.strokeStyle = colors.gridLine;
     ctx.lineWidth = 1/zoom;
     const gridSize = 30;
@@ -554,14 +537,12 @@ function draw() {
     const endX = Math.ceil((canvas.width - panX)/zoom / gridSize) * gridSize;
     const startY = Math.floor(-panY/zoom / gridSize) * gridSize;
     const endY = Math.ceil((canvas.height - panY)/zoom / gridSize) * gridSize;
-    
     for (let x = startX; x < endX; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x, -panY/zoom);
         ctx.lineTo(x, (canvas.height - panY)/zoom);
         ctx.stroke();
     }
-    
     for (let y = startY; y < endY; y += gridSize) {
         ctx.beginPath();
         ctx.moveTo(-panX/zoom, y);
@@ -606,7 +587,6 @@ function draw() {
         ctx.stroke();
     }
     ctx.restore();
-    // Draw blocks and forces 
     blocks.forEach((block, index) => {
         const blockPos = block.position;
         const blockLocalY = -INCLINE_THICKNESS - BLOCK_SIZE / 2;
@@ -620,8 +600,6 @@ function draw() {
             ctx.lineWidth = 4/zoom;
             ctx.strokeRect(blockWorldX - BLOCK_SIZE/2 - 5, blockWorldY - BLOCK_SIZE/2 - 5, BLOCK_SIZE + 10, BLOCK_SIZE + 10);
         }
-        
-        // Draw block
         ctx.fillStyle = colors.block;
         ctx.fillRect(blockWorldX - BLOCK_SIZE/2, blockWorldY - BLOCK_SIZE/2, BLOCK_SIZE, BLOCK_SIZE);
         
@@ -654,7 +632,7 @@ function draw() {
     const blockWorldY = inclineStartY + Math.sin(-angleRad) * blockPos + Math.cos(-angleRad) * blockLocalY;
     const forces = calculateForces();
     const forceScale = 3; 
-    // Draw weight vector always towards gravity (down)
+    // Draw weight vector always towards gravity - down
     drawArrow(ctx, blockWorldX, blockWorldY, blockWorldX, blockWorldY + forces.weight * forceScale, colors.weight, 'W', zoom);
     
     // Draw normal force always perpendicular to the incline
@@ -678,8 +656,6 @@ function draw() {
         const frictionEndY = blockWorldY - Math.sin(angleRad) * forces.frictionForce * forceScale * frictionDir;
         drawArrow(ctx, blockWorldX, blockWorldY, frictionEndX, frictionEndY, colors.friction, 'f', zoom);
     }
-    
-    // Draw angle indicator
     ctx.strokeStyle = colors.text + '60';
     ctx.lineWidth = 2/zoom;
     ctx.beginPath();
@@ -726,13 +702,12 @@ function drawArrow(ctx, x1, y1, x2, y2, color, label, zoom) {
     ctx.fillText(label, x2 + 10, y2 - 10);
 }
 
-// Animation
+// ani mationssssss
 function animate() {
     if (!isAnimating) return;
     
-    const dt = 0.016; // 60fps
+    const dt = 0.016;
     time += dt;
-    
     const angleRad = angle * Math.PI / 180;
     
     blocks.forEach((block, index) => {
@@ -772,11 +747,9 @@ function animate() {
         // Update velocity and position accordingly
         block.velocity += acceleration * dt;
         block.position += block.velocity * dt * 50;
-        
-        // Boundary checks
         if (block.position < 0) {
             block.position = 0;
-            block.velocity = -block.velocity * 0.5;// Bounce
+            block.velocity = -block.velocity * 0.5;
         } else if (block.position > INCLINE_LENGTH) {
             block.position = INCLINE_LENGTH;
             block.velocity = 0;
@@ -785,7 +758,6 @@ function animate() {
         selectedBlock = prevSelected;
     });
     
-    // Check block collisions
     for (let i = 0; i < blocks.length; i++) {
         for (let j = i + 1; j < blocks.length; j++) {
             const block1 = blocks[i];
@@ -795,8 +767,6 @@ function animate() {
             if (dist < BLOCK_SIZE) {
                 // if Collision detected
                 const overlap = BLOCK_SIZE - dist;
-                
-                // Separate blocks
                 if (block1.position < block2.position) {
                     block1.position -= overlap / 2;
                     block2.position += overlap / 2;
@@ -805,7 +775,7 @@ function animate() {
                     block2.position -= overlap / 2;
                 }
                 
-                // Exchange velocities for elastic collisons 
+                // exchange velocities for elastic collisons 
                 const v1 = block1.velocity;
                 const v2 = block2.velocity;
                 const m1 = block1.mass;
@@ -813,8 +783,6 @@ function animate() {
                 
                 block1.velocity = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
                 block2.velocity = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
-                
-                // Add damping
                 block1.velocity *= 0.8;
                 block2.velocity *= 0.8;
             }
@@ -828,8 +796,6 @@ function animate() {
         animationFrame = requestAnimationFrame(animate);
     }
 }
-
-// Initial setup
 setTimeout(() => {
     calculateForces();
     updateZoomDisplay();

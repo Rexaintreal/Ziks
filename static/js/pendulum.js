@@ -29,7 +29,6 @@ const MAX_ZOOM = 4;
 let isDragging = false;
 let dragOffset = { x: 0, y: 0 };
 
-// Trail effect
 let trail = [];
 const MAX_TRAIL_LENGTH = 100;
 
@@ -52,8 +51,6 @@ function resizeCanvas() {
 
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
-
-// Get controls
 const angleSlider = document.getElementById('angle');
 const angleDisplay = document.getElementById('angleDisplay');
 const angleUnitSelect = document.getElementById('angleUnit');
@@ -63,20 +60,19 @@ const gravityInput = document.getElementById('gravity');
 const dampingInput = document.getElementById('damping');
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
-
 const zoomInBtn = document.getElementById('zoomInBtn');
 const zoomOutBtn = document.getElementById('zoomOutBtn');
 const resetViewBtn = document.getElementById('resetViewBtn');
 const zoomDisplay = document.getElementById('zoomDisplay');
 
-// Update angle arc visualization
+//updating angle arc visualization
 function updateAngleArc() {
     const angleRad = angle * Math.PI / 180;
     const radius = 28;
     const cx = 40;
     const cy = 40;
     
-    // Update angle line account for negative angles too
+    //update angle line and account for negative angles too
     const endX = cx + radius * Math.sin(angleRad);
     const endY = cy + radius * Math.cos(angleRad);
     document.getElementById('anglePath').setAttribute('d', `M ${cx} ${cy} L ${endX} ${endY}`);
@@ -89,7 +85,6 @@ function updateAngleArc() {
     document.getElementById('angleArcPath').setAttribute('d', arcPath);
 }
 
-// Update angle display
 function updateAngleDisplay() {
     const angleValue = parseFloat(angleSlider.value);
     if (angleUnitSelect.value === 'degrees') {
@@ -130,7 +125,6 @@ dampingInput.addEventListener('change', () => {
     damping = parseFloat(dampingInput.value);
 });
 
-// Zoom functions
 function updateZoomDisplay() {
     if (zoomDisplay) {
         zoomDisplay.textContent = `${Math.round(zoom * 100)}%`;
@@ -179,7 +173,6 @@ canvas.addEventListener('wheel', (e) => {
     setZoom(zoom * zoomFactor, mouseX, mouseY);
 });
 
-// Mouse interactions
 canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left - panX) / zoom;
@@ -278,7 +271,7 @@ canvas.addEventListener('mouseleave', () => {
 
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-// Calculate physics
+// Calculate physisc
 function calculatePhysics() {
     // time period =  2pi root L/g  for small angles
     const period = 2 * Math.PI * Math.sqrt(length / gravity);
@@ -287,17 +280,17 @@ function calculatePhysics() {
     // Current angle in the radians
     const angleRad = angle * Math.PI / 180;
     
-    // Potential energy at current angle
+    //PEat current angle
     const height = length - length * Math.cos(angleRad);
     const potentialEnergy = mass * gravity * height;
     
-    // Kinetic energy
+    //KE
     const kineticEnergy = 0.5 * mass * length * length * angularVelocity * angularVelocity;
     
-    // Total energy
+    //TE
     const totalEnergy = potentialEnergy + kineticEnergy;
     
-    // Update stats
+    //update stats on the page
     document.getElementById('period').textContent = period.toFixed(3) + ' s';
     document.getElementById('frequency').textContent = frequency.toFixed(3) + ' Hz';
     
@@ -331,46 +324,34 @@ function getThemeColors() {
 // Draw function
 function draw() {
     if (!canvas || !ctx) return;
-    
     const colors = getThemeColors();
-    
     ctx.save();
     ctx.translate(panX, panY);
     ctx.scale(zoom, zoom);
-    
-    // Clear canvas
     ctx.fillStyle = colors.bg;
     ctx.fillRect(-panX/zoom, -panY/zoom, canvas.width/zoom, canvas.height/zoom);
-    
-    // Draw grid
     ctx.strokeStyle = colors.gridLine;
     ctx.lineWidth = 1/zoom;
     const gridSize = 30;
-    
     const startX = Math.floor(-panX/zoom / gridSize) * gridSize;
     const endX = Math.ceil((canvas.width - panX)/zoom / gridSize) * gridSize;
     const startY = Math.floor(-panY/zoom / gridSize) * gridSize;
     const endY = Math.ceil((canvas.height - panY)/zoom / gridSize) * gridSize;
-    
     for (let x = startX; x < endX; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x, -panY/zoom);
         ctx.lineTo(x, (canvas.height - panY)/zoom);
         ctx.stroke();
     }
-    
     for (let y = startY; y < endY; y += gridSize) {
         ctx.beginPath();
         ctx.moveTo(-panX/zoom, y);
         ctx.lineTo((canvas.width - panX)/zoom, y);
         ctx.stroke();
     }
-    
     const centerX = canvas.width / (2 * zoom);
     const centerY = canvas.height / (2 * zoom) - 50;
     const scale = 50;
-    
-    // Draw motion arc full circle for 360 degree motion
     ctx.strokeStyle = colors.arc;
     ctx.lineWidth = 2/zoom;
     ctx.setLineDash([10/zoom, 10/zoom]);
@@ -378,8 +359,6 @@ function draw() {
     ctx.arc(centerX, centerY, length * scale, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
-    
-    // Draw trail
     if (trail.length > 1) {
         ctx.strokeStyle = colors.trail;
         ctx.lineWidth = 3/zoom;
@@ -391,12 +370,10 @@ function draw() {
         ctx.stroke();
     }
     
-    // Calculate bob position
+    // calculating bob position
     const angleRad = angle * Math.PI / 180;
     const bobX = centerX + Math.sin(angleRad) * length * scale;
     const bobY = centerY + Math.cos(angleRad) * length * scale;
-    
-    // Draw string
     ctx.strokeStyle = colors.string;
     ctx.lineWidth = 3/zoom;
     ctx.beginPath();
@@ -404,7 +381,8 @@ function draw() {
     ctx.lineTo(bobX, bobY);
     ctx.stroke();
     
-    // Draw pivot point
+
+
     ctx.fillStyle = colors.pivot;
     ctx.beginPath();
     ctx.arc(centerX, centerY, PIVOT_RADIUS, 0, Math.PI * 2);
@@ -414,17 +392,13 @@ function draw() {
     ctx.lineWidth = 2/zoom;
     ctx.stroke();
     
-    // Draw bob
     ctx.fillStyle = colors.bob;
     ctx.beginPath();
     ctx.arc(bobX, bobY, BOB_RADIUS, 0, Math.PI * 2);
     ctx.fill();
-    
     ctx.strokeStyle = colors.bobBorder;
     ctx.lineWidth = 3/zoom;
     ctx.stroke();
-    
-    // Draw mass label on bob
     ctx.fillStyle = colors.text;
     ctx.font = `bold ${14/zoom}px Inter`;
     ctx.textAlign = 'center';
@@ -468,16 +442,13 @@ function animate() {
     // Update angular velocity: omega = omega + angular veloccity * dt
     angularVelocity += angularAcceleration * dt;
     
-    // Apply damping only if damping is set to less than 1
     if (damping < 1) {
         angularVelocity *= damping;
     }
     
-    // Update angle in radians first for more accuracy
     const angleRadNew = angleRad + angularVelocity * dt;
     angle = angleRadNew * (180 / Math.PI);
     
-    // Normalize angle to -180 to +180 range for display
     while (angle > 180) angle -= 360;
     while (angle < -180) angle += 360;
     
@@ -516,14 +487,12 @@ function animate() {
     }
 }
 
-// Start button
 startBtn.addEventListener('click', () => {
     if (isAnimating) {
         isAnimating = false;
         cancelAnimationFrame(animationFrame);
         startBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start';
     } else {
-        // convert the initial angle to radian and the set to 0
         const angleRad = angle * Math.PI / 180;
         angularVelocity = 0;
         trail = [];
@@ -534,7 +503,6 @@ startBtn.addEventListener('click', () => {
     }
 });
 
-// Reset button
 resetBtn.addEventListener('click', () => {
     isAnimating = false;
     cancelAnimationFrame(animationFrame);
@@ -561,7 +529,6 @@ resetBtn.addEventListener('click', () => {
     draw();
 });
 
-// Initial setup
 setTimeout(() => {
     updateAngleArc();
     calculatePhysics();

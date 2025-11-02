@@ -10,7 +10,6 @@ let trajectory = [];
 let scale = 3;
 let impactEffect = null;
 
-// Zoom and pan state variables
 let zoom = 1;
 let panX = 0;
 let panY = 0;
@@ -42,7 +41,6 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Get controls from DOM
 const angleSlider = document.getElementById('angle');
 const angleDisplay = document.getElementById('angleDisplay');
 const angleUnit = document.getElementById('angleUnit');
@@ -52,7 +50,6 @@ const gravityInput = document.getElementById('gravity');
 const launchBtn = document.getElementById('launchBtn');
 const resetBtn = document.getElementById('resetBtn');
 
-// Zoom controls from DOM
 const zoomInBtn = document.getElementById('zoomInBtn');
 const zoomOutBtn = document.getElementById('zoomOutBtn');
 const resetViewBtn = document.getElementById('resetViewBtn');
@@ -67,12 +64,12 @@ function updateAngleArc() {
     
     // updating angel line
     const endX = cx + radius * Math.cos(-angleRad);
-    const endY = cy + radius * Math.sin(-angleRad);
+    const endY = cy + radius *Math.sin(-angleRad);
     document.getElementById('anglePath').setAttribute('d', `M ${cx} ${cy} L ${endX} ${endY}`);
     
     // updating arc
     const largeArc = angleRad > Math.PI ? 1 : 0;
-    const arcPath = `M ${cx + radius} ${cy} A ${radius} ${radius} 0 ${largeArc} 0 ${endX} ${endY}`;
+    const arcPath = `M ${cx +radius} ${cy} A ${radius} ${radius} 0 ${largeArc} 0 ${endX} ${endY}`;
     document.getElementById('angleArcPath').setAttribute('d', arcPath);
 }
 
@@ -83,7 +80,7 @@ function updateAngleDisplay() {
         angleDisplay.textContent = angleValue + '°';
         angle = angleValue;
     } else {
-        const radians = (angleValue * Math.PI / 180).toFixed(3);
+        const radians =(angleValue * Math.PI / 180).toFixed(3);
         angleDisplay.textContent = radians + ' rad';
         angle = angleValue;
     }

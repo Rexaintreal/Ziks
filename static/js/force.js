@@ -45,18 +45,17 @@ window.addEventListener('load', () => {
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-
 function resizeCanvas() {
     const wrapper = canvas.parentElement;
     canvas.width = wrapper.clientWidth;
     canvas.height = wrapper.clientHeight;
     draw();
 }
-
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Get controls
+
+
 const massInput = document.getElementById('mass');
 const gravityInput = document.getElementById('gravity');
 const frictionInput = document.getElementById('friction');
@@ -66,7 +65,6 @@ const addForceBtn = document.getElementById('addForceBtn');
 const addBlockBtn = document.getElementById('addBlockBtn');
 const simulateBtn = document.getElementById('simulateBtn');
 const resetBtn = document.getElementById('resetBtn');
-
 const zoomInBtn = document.getElementById('zoomInBtn');
 const zoomOutBtn = document.getElementById('zoomOutBtn');
 const resetViewBtn = document.getElementById('resetViewBtn');
@@ -107,12 +105,12 @@ gravityInput.addEventListener('change', () => {
     draw();
 });
 
+
 frictionInput.addEventListener('change', () => {
     friction = parseFloat(frictionInput.value);
     calculateForces();
     draw();
 });
-
 angleSlider.addEventListener('input', () => {
     surfaceAngle = parseFloat(angleSlider.value);
     angleDisplay.textContent = surfaceAngle + '°';
@@ -151,7 +149,6 @@ resetBtn.addEventListener('click', () => {
     simulateBtn.innerHTML = '<i class="fa-solid fa-play"></i> Simulate';
     draw();
 });
-// Zoom controls
 function updateZoomDisplay() {
     if (zoomDisplay) {
         zoomDisplay.textContent = `${Math.round(zoom * 100)}%`;
@@ -229,7 +226,7 @@ canvas.addEventListener('mousedown', (e) => {
         }
     }
     
-    // Check if clicking on a block
+    // Check if the user is clicking on a block
     for (let i = 0; i < blocks.length; i++) {
         const checkBlock = blocks[i];
         const checkBlockX = centerX + checkBlock.position.x;
@@ -241,7 +238,7 @@ canvas.addEventListener('mousedown', (e) => {
             massInput.value = checkBlock.mass;
             updateForcesList();
             
-            // Start dragging the block
+            // Start dragging the block if moving
             draggedBlock = i;
             dragOffset = {
                 x: mouseX - checkBlock.position.x,
@@ -252,8 +249,6 @@ canvas.addEventListener('mousedown', (e) => {
             return;
         }
     }
-    
-    // Otherwies pan
     if (e.button === 2 || e.button === 0) {
         e.preventDefault();
         isPanning = true;
@@ -275,21 +270,17 @@ canvas.addEventListener('mousemove', (e) => {
         const block = blocks[selectedBlock];
         const blockX = centerX + block.position.x;
         const blockY = centerY + block.position.y;
-        
         const dx = mouseX - blockX;
         const dy = blockY - mouseY;
-        
         const magnitude = Math.sqrt(dx * dx + dy * dy) / 2;
         const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        
         block.appliedForces[draggedForce].magnitude = Math.max(0, Math.round(magnitude * 10) / 10);
         block.appliedForces[draggedForce].angle = Math.round(angle);
-        
         updateForcesList();
         calculateForces();
         draw();
     } else if (draggedBlock !== null) {
-        // Drag the block (disable physics while dragging any block)
+        // Drag the block (disable physics simulator while dragging any block)
         blocks[draggedBlock].position.x = mouseX - dragOffset.x;
         blocks[draggedBlock].position.y = mouseY - dragOffset.y;
         blocks[draggedBlock].velocity = { x: 0, y: 0 };
@@ -307,8 +298,6 @@ canvas.addEventListener('mousemove', (e) => {
     } else {
         let overForce = false;
         let overBlock = false;
-        
-        // Check blocks
         for (let checkBlock of blocks) {
             const checkBlockX = centerX + checkBlock.position.x;
             const checkBlockY = centerY + checkBlock.position.y;
@@ -319,8 +308,6 @@ canvas.addEventListener('mousemove', (e) => {
                 break;
             }
         }
-        
-        // Check forces
         const block = blocks[selectedBlock];
         const blockX = centerX + block.position.x;
         const blockY = centerY + block.position.y;
@@ -330,14 +317,12 @@ canvas.addEventListener('mousemove', (e) => {
             const forceScale = 2;
             const endX = blockX + Math.cos(angleRad) * force.magnitude * forceScale;
             const endY = blockY - Math.sin(angleRad) * force.magnitude * forceScale;
-            
             const dist = Math.sqrt((mouseX - endX) ** 2 + (mouseY - endY) ** 2);
             if (dist < 15) {
                 overForce = true;
                 break;
             }
         }
-        
         canvas.style.cursor = overForce ? 'grab' : (overBlock ? 'grab' : (zoom > 1 ? 'grab' : 'crosshair'));
     }
 });
@@ -358,7 +343,6 @@ canvas.addEventListener('mouseleave', () => {
 
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-// Force management
 function addForce() {
     const forceId = Date.now();
     blocks[selectedBlock].appliedForces.push({
@@ -415,12 +399,10 @@ function updateForce(id, property, value) {
         draw();
     }
 }
-
-// Make functions global
 window.removeForce = removeForce;
 window.updateForce = updateForce;
 
-// Check if block is on surface
+// Check if the block is on surface
 function isBlockOnSurface(block) {
     const angleRad = surfaceAngle * Math.PI / 180;
     const surfaceY = block.position.x * Math.tan(angleRad);
@@ -428,12 +410,11 @@ function isBlockOnSurface(block) {
     return block.position.y >= onSurfaceY - 2;
 }
 
-// Calculate forces
+
 function calculateForces() {
     const block = blocks[selectedBlock];
     const angleRad = surfaceAngle * Math.PI / 180;
     
-    // Check if block is on surface
     block.onSurface = isBlockOnSurface(block);
     
     // Weight (always present even in air)
@@ -456,7 +437,6 @@ function calculateForces() {
         maxFriction = friction * normal;
     }
     
-    // Applied forces
     let appliedForceX = 0;
     let appliedForceY = 0;
     
@@ -473,8 +453,6 @@ function calculateForces() {
     if (block.onSurface) {
         // Net force parallel to surface
         let netParallel = appliedForceX * Math.cos(angleRad) + appliedForceY * Math.sin(angleRad) - weightParallel;
-        
-        // Apply friction
         if (Math.abs(netParallel) > maxFriction) {
             frictionForce = maxFriction * Math.sign(netParallel);
             netParallel -= frictionForce;
@@ -492,10 +470,10 @@ function calculateForces() {
         netForceY = appliedForceY + weight;
     }
     
+
+
     const netMagnitude = Math.sqrt(netForceX ** 2 + netForceY ** 2);
     const acceleration = netMagnitude / block.mass;
-    
-    // Update stats
     document.getElementById('netForceX').textContent = netForceX.toFixed(2) + ' N';
     document.getElementById('netForceY').textContent = netForceY.toFixed(2) + ' N';
     document.getElementById('netMagnitude').textContent = netMagnitude.toFixed(2) + ' N';
@@ -527,40 +505,31 @@ function drawFBDInStats(forces) {
         friction: '#ffd43b',
         applied: '#51cf66'
     };
-    
-    // Clear
     fbdCtx.fillStyle = colors.bg;
     fbdCtx.fillRect(0, 0, width, height);
-    
     const centerX = width / 2;
     const centerY = height / 2;
     const blockSize = 40;
     const scale = 0.6;
-    
-    // Draw block
     fbdCtx.fillStyle = colors.block;
     fbdCtx.fillRect(centerX - blockSize/2, centerY - blockSize/2, blockSize, blockSize);
     fbdCtx.strokeStyle = colors.blockBorder;
     fbdCtx.lineWidth = 2;
     fbdCtx.strokeRect(centerX - blockSize/2, centerY - blockSize/2, blockSize, blockSize);
-    
-    // Draw forces
     const block = blocks[selectedBlock];
-    
-    // Weight (always present)
+    // Weight is always present
     drawArrowSimple(fbdCtx, centerX, centerY, centerX, centerY + forces.weight * scale, colors.gravity, 'W');
     
-    // Normal (only if on surface)
+    // Normal is only present if on surface
     if (block.onSurface && forces.normal > 0) {
         drawArrowSimple(fbdCtx, centerX, centerY, centerX, centerY - forces.normal * scale, colors.normal, 'N');
     }
     
-    // Friction (only if on surface)
+    // Friction is only present if on surface just like normal 
     if (block.onSurface && Math.abs(forces.frictionForce) > 0.01) {
         drawArrowSimple(fbdCtx, centerX, centerY, centerX - forces.frictionForce * scale, centerY, colors.friction, 'f');
     }
     
-    // Applied forces
     block.appliedForces.forEach((force, index) => {
         const fAngleRad = force.angle * Math.PI / 180;
         const endX = centerX + Math.cos(fAngleRad) * force.magnitude * scale;
@@ -572,32 +541,23 @@ function drawFBDInStats(forces) {
 function drawArrowSimple(ctx, x1, y1, x2, y2, color, label) {
     const headLength = 10;
     const angle = Math.atan2(y2 - y1, x2 - x1);
-    
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = 2.5;
-    
-    // Line
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
-    
-    // Arrowhead
     ctx.beginPath();
     ctx.moveTo(x2, y2);
     ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
     ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
     ctx.closePath();
     ctx.fill();
-    
-    // Label
     ctx.font = 'bold 12px Inter';
     ctx.fillStyle = color;
     ctx.fillText(label, x2 + 8, y2 - 8);
 }
-
-// Get theme colors
 function getThemeColors() {
     const isDark = document.body.getAttribute('data-theme') === 'dark';
     return {
@@ -617,7 +577,7 @@ function getThemeColors() {
     };
 }
 
-// Check collision between two blocks
+// Check collision between two blocks function
 function checkBlockCollision(block1, block2) {
     const dx = block1.position.x - block2.position.x;
     const dy = block1.position.y - block2.position.y;
@@ -627,18 +587,15 @@ function checkBlockCollision(block1, block2) {
     return distance < minDistance;
 }
 
-// Resolve collision between two blocks
+// Resolve collision func
 function resolveBlockCollision(block1, block2) {
     const dx = block1.position.x - block2.position.x;
     const dy = block1.position.y - block2.position.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
     if (distance === 0) return;
-    
     const minDistance = BLOCK_SIZE;
     const overlap = minDistance - distance;
-    
-    // Separate blocks
     const separationX = (dx / distance) * overlap / 2;
     const separationY = (dy / distance) * overlap / 2;
     
@@ -650,12 +607,8 @@ function resolveBlockCollision(block1, block2) {
     // Calculate relative velocity
     const relVelX = block1.velocity.x - block2.velocity.x;
     const relVelY = block1.velocity.y - block2.velocity.y;
-    
-    // Normal direction
     const normalX = dx / distance;
     const normalY = dy / distance;
-    
-    // Relative velocity in normal direction
     const velAlongNormal = relVelX * normalX + relVelY * normalY;
     
     // Dont resolve if velocities are separating
@@ -680,16 +633,11 @@ function draw() {
     if (!canvas || !ctx) return;
     
     const colors = getThemeColors();
-    
     ctx.save();
     ctx.translate(panX, panY);
     ctx.scale(zoom, zoom);
-    
-    // Clear canvas
     ctx.fillStyle = colors.bg;
     ctx.fillRect(-panX/zoom, -panY/zoom, canvas.width/zoom, canvas.height/zoom);
-    
-    // Draw grid
     ctx.strokeStyle = colors.gridLine;
     ctx.lineWidth = 1/zoom;
     const gridSize = 30;
@@ -743,8 +691,6 @@ function draw() {
     }
     
     ctx.restore();
-    
-    // Draw blocks
     blocks.forEach((block, index) => {
         const blockX = centerX + block.position.x;
         const blockY = centerY + block.position.y;
@@ -808,8 +754,6 @@ function draw() {
         const frictionEndY = blockY - Math.sin(angleRad) * forces.frictionForce * forceScale * Math.sign(forces.frictionForce);
         drawArrow(ctx, blockX, blockY, frictionEndX, frictionEndY, colors.friction, 'Friction');
     }
-    
-    // Draw applied forces
     selectedBlockObj.appliedForces.forEach((force, index) => {
         const fAngleRad = force.angle * Math.PI / 180;
         const endX = blockX + Math.cos(fAngleRad) * force.magnitude * forceScale;
@@ -823,26 +767,19 @@ function draw() {
 function drawArrow(ctx, x1, y1, x2, y2, color, label) {
     const headLength = 12;
     const angle = Math.atan2(y2 - y1, x2 - x1);
-    
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = 3/zoom;
-    
-    // Line
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
-    
-    // Arrowhead
     ctx.beginPath();
     ctx.moveTo(x2, y2);
     ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
     ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
     ctx.closePath();
     ctx.fill();
-    
-    // Label
     ctx.font = `bold ${14/zoom}px Inter`;
     ctx.fillStyle = color;
     ctx.fillText(label, x2 + 10, y2 - 10);
@@ -915,9 +852,9 @@ function animate() {
         const ax = netForceX / block.mass;
         const ay = netForceY / block.mass;
         
+
         block.velocity.x += ax * dt;
         block.velocity.y += ay * dt;
-        
         block.position.x += block.velocity.x * dt * 50;
         block.position.y += block.velocity.y * dt * 50;
         
@@ -925,6 +862,9 @@ function animate() {
         const angleRad = surfaceAngle * Math.PI / 180;
         const surfaceY = block.position.x * Math.tan(angleRad);
         
+
+
+
         if (block.position.y >= surfaceY - BLOCK_SIZE/2) {
             block.position.y = surfaceY - BLOCK_SIZE/2;
             
@@ -958,7 +898,11 @@ function animate() {
     animationFrame = requestAnimationFrame(animate);
 }
 
-// Initial setup
+
+
+
+
+
 setTimeout(() => {
     calculateForces();
     updateZoomDisplay();
