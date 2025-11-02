@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Motion - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/circular.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Circular Motion Simulator... (づ｡◕‿‿◕｡)づ</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Circular Motion Simulator</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Radius (m)</label>
+                <div class="slider-container">
+                    <input type="range" id="radiusSlider" min="50" max="250" value="150" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler-combined"></i>
+                    <span class="angle-value" id="radiusDisplay">3 m</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Object Mass (kg)</label>
+                <input type="number" id="mass" value="2" min="0.1" max="50" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Manage Objects</label>
+                <div class="btn-group" style="margin-top: 0;">
+                    <button class="btn btn-secondary" id="addObjectBtn" style="flex: 1;">
+                        <i class="fa-solid fa-plus"></i> Add
+                    </button>
+                    <button class="btn btn-secondary" id="removeObjectBtn" style="flex: 1;">
+                        <i class="fa-solid fa-minus"></i> Remove
+                    </button>
+                </div>
+                <div style="margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: var(--bg); border-radius: 6px; border: 1px solid var(--border);">
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;">Selected: Object <span id="selectedObjectDisplay">1</span></span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Angular Velocity (rad/s)</label>
+                <div class="slider-container">
+                    <input type="range" id="angularVelocitySlider" min="0" max="5" value="1" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-gauge"></i>
+                    <span class="angle-value" id="angularVelocityDisplay">1.0 rad/s</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Tension/Centripetal Mode</label>
+                <select id="modeSelect">
+                    <option value="tension">String Tension (Horizontal)</option>
+                    <option value="vertical">Vertical Circle (with Gravity)</option>
+                    <option value="centripetal">Free Circular Motion</option>
+                    <option value="banked">Banked Curve</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="bankAngleGroup" style="display: none;">
+                <label>Bank Angle (°)</label>
+                <div class="slider-container">
+                    <input type="range" id="bankAngleSlider" min="0" max="60" value="30" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-angle-up"></i>
+                    <span class="angle-value" id="bankAngleDisplay">30°</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Gravity (m/s²)</label>
+                <input type="number" id="gravity" value="9.8" min="0" max="20" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Air Resistance</label>
+                <div class="slider-container">
+                    <input type="range" id="dampingSlider" min="0.95" max="1" value="0.999" step="0.001">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-wind"></i>
+                    <span class="angle-value" id="dampingDisplay">0.999</span>
+                </div>
+            </div>
+
+            <div class="force-controls">
+                <h4 style="color: var(--text); margin-bottom: 1rem; font-size: 1rem;">Applied Forces</h4>
+                <button class="btn btn-secondary" id="addForceBtn" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-plus"></i> Add Force
+                </button>
+                <div id="forcesList"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-play"></i> Start
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Physics Data</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-circle-notch"></i>
+                        Angular Velocity (ω)
+                    </span>
+                    <span class="stat-value" id="omega">0 rad/s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Tangential Velocity
+                    </span>
+                    <span class="stat-value" id="tangentialVelocity">0 m/s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        Centripetal Force
+                    </span>
+                    <span class="stat-value" id="centripetalForce">0 N</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        Centripetal Accel.
+                    </span>
+                    <span class="stat-value" id="centripetalAccel">0 m/s²</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-link"></i>
+                        String Tension
+                    </span>
+                    <span class="stat-value" id="tension">0 N</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Period (T)
+                    </span>
+                    <span class="stat-value" id="period">0 s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-rotate"></i>
+                        Frequency (f)
+                    </span>
+                    <span class="stat-value" id="frequency">0 Hz</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Kinetic Energy
+                    </span>
+                    <span class="stat-value" id="kineticEnergy">0 J</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-mountain"></i>
+                        Potential Energy
+                    </span>
+                    <span class="stat-value" id="potentialEnergy">0 J</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Tips</h4>
+                <p><strong>Drag objects</strong> to change their position on the circle</p>
+                <p><strong>Drag force arrows</strong> to adjust magnitude and direction</p>
+                <p><strong>Vertical mode:</strong> See gravity effects and minimum speed requirements!</p>
+                <p><strong>Banked curve:</strong> Objects can turn without friction at optimal speed</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/circular.js') }}"></script>
+</body>
+</html>

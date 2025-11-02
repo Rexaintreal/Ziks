@@ -22,5 +22,9 @@ def pendulum():
 def incline():
     return render_template('incline.html')
 
+@app.route('/circular')
+def circular():
+    return render_template('circular.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
