@@ -36,6 +36,10 @@ def spring():
 def collision():
     return render_template('collision.html')
 
+@app.route('/torque')
+def torque():
+    return render_template('torque.html')
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)

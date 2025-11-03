@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torque Simulator - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/torque.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Torque Simulator... (っ◔◡◔)っ</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Torque & Rotational Equilibrium</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Beam Length (m)</label>
+                <div class="slider-container">
+                    <input type="range" id="beamLength" min="2" max="10" value="6" step="0.5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler-horizontal"></i>
+                    <span id="beamLengthDisplay">6 m</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Pivot Position</label>
+                <div class="slider-container">
+                    <input type="range" id="pivotPosition" min="0" max="100" value="50" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span id="pivotDisplay">Center</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Gravity (m/s²)</label>
+                <input type="number" id="gravity" value="9.8" min="1" max="20" step="0.1">
+            </div>
+
+            <div class="weight-controls">
+                <h4 style="color: var(--text); margin-bottom: 1rem; font-size: 1rem;">Weights</h4>
+                <button class="btn btn-secondary" id="addWeightBtn" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-plus"></i> Add Weight
+                </button>
+                <div id="weightsList"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="releaseBtn">
+                    <i class="fa-solid fa-play"></i> Release
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Torque Analysis</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        Clockwise Torque
+                    </span>
+                    <span class="stat-value" id="clockwiseTorque">0 N⋅m</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Counter-Clockwise
+                    </span>
+                    <span class="stat-value" id="counterClockwiseTorque">0 N⋅m</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-balance-scale"></i>
+                        Net Torque
+                    </span>
+                    <span class="stat-value" id="netTorque">0 N⋅m</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-check-circle"></i>
+                        Status
+                    </span>
+                    <span class="stat-value" id="equilibriumStatus">Balanced</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Physics Tips</h4>
+                <p><strong>Torque (τ)</strong> = r × F × sin(θ)</p>
+                <p><strong>Equilibrium:</strong> Στ = 0</p>
+                <p><strong>Clockwise</strong> torques are negative</p>
+                <p><strong>Counter-clockwise</strong> are positive</p>
+                <p><strong>Drag weights</strong> to reposition them!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/torque.js') }}"></script>
+</body>
+</html>
