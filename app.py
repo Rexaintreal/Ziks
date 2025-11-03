@@ -2,10 +2,12 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
+# ----------------- landing page -----------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# ----------------- Mechanics section -----------------
 @app.route('/projectile')
 def projectile():
     return render_template('projectile.html')
@@ -30,5 +32,10 @@ def circular():
 def spring():
     return render_template('spring.html')
 
+@app.route('/collision')
+def collision():
+    return render_template('collision.html')
+
+# ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)

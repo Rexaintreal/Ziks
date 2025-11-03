@@ -18,33 +18,25 @@
                 <span>Ziks</span>
             </div>
         </div>
-        <div class="nav-center">
-            <a href="/projectile" class="nav-link">
-                <i class="fa-solid fa-rocket"></i>
-                Projectile Motion
-            </a>
-            <a href="/force" class="nav-link">
-                <i class="fa-solid fa-arrows-left-right"></i>
-                Force Engine
-            </a>
-            <a href="/pendulum" class="nav-link">
-                <i class="fa-solid fa-clock"></i>
-                Pendulum
-            </a>
-            <a href="/incline" class="nav-link">
-                <i class="fa-solid fa-arrow-trend-up"></i>
-                Inclined Plane
-            </a>
-            <a href="/circular" class="nav-link">
-                <i class="fa-solid fa-circle-notch"></i>
-                Circular Motion
-            </a>
-            <a href="/spring" class="nav-link">
-                <i class="fa-solid fa-wave-square"></i>
-                Spring System
-            </a>
 
+        <div class="nav-center">
+            <div class="dropdown">
+                <button class="dropbtn nav-link">
+                    <i class="fa-solid fa-cubes"></i>
+                    Mechanics <i class="fa-solid fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/projectile"><i class="fa-solid fa-rocket"></i> Projectile Motion</a>
+                    <a href="/force"><i class="fa-solid fa-arrows-left-right"></i> Force Engine</a>
+                    <a href="/pendulum"><i class="fa-solid fa-clock"></i> Pendulum</a>
+                    <a href="/incline"><i class="fa-solid fa-arrow-trend-up"></i> Inclined Plane</a>
+                    <a href="/circular"><i class="fa-solid fa-circle-notch"></i> Circular Motion</a>
+                    <a href="/spring"><i class="fa-solid fa-wave-square"></i> Spring System</a>
+                    <a href="/collision"><i class="fa-solid fa-burst"></i> Collision Simulation</a>
+                </div>
+            </div>
         </div>
+
         <button class="theme-toggle" id="themeToggle">
             <i class="fa-solid fa-sun" id="themeIcon"></i>
         </button>
@@ -52,30 +44,17 @@
 
     <div class="hero">
         <h1>Ziks Engine</h1>
-        <p>A physics simulator made for the Axiom YSWS visualize physics stuff using various simulations</p>
+        <p>A physics simulator made for the Axiom YSWS visualize physics concepts using real simulations</p>
         
         <div class="hero-links">
             <a href="https://axiom.hackclub.com/" target="_blank" class="hero-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                    <polyline points="15 3 21 3 21 9"/>
-                    <line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-                Axiom YSWS
+                <i class="fa-solid fa-link"></i> Axiom YSWS
             </a>
             <a href="https://github.com/Rexaintreal/Ziks" target="_blank" class="hero-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                </svg>
-                GitHub
+                <i class="fa-brands fa-github"></i> GitHub
             </a>
             <a href="https://saurabhcodesawfully.pythonanywhere.com/" target="_blank" class="hero-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="2" y1="12" x2="22" y2="12"/>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-                Portfolio
+                <i class="fa-solid fa-globe"></i> Portfolio
             </a>
         </div>
     </div>
@@ -90,44 +69,41 @@
                 </svg>
             </div>
             <h3>Projectile Motion</h3>
-            <p>Change the angles, speed, and gravity to see how far your object can fly</p>
+            <p>Change the angles, speed, and gravity to see your object launch like angry birds</p>
         </a>
 
         <a href="/force" class="card">
             <div class="card-icon">
                 <svg viewBox="0 0 24 24">
                     <rect x="8" y="9" width="8" height="6" rx="1"/>
-                    <path d="M16 12 L22 12 M22 12 L20 10 M22 12 L20 14" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12 L8 12 M2 12 L4 10 M2 12 L4 14" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 12 L22 12 M22 12 L20 10 M22 12 L20 14"/>
+                    <path d="M2 12 L8 12 M2 12 L4 10 M2 12 L4 14"/>
                 </svg>
             </div>
             <h3>Force Engine</h3>
-            <p>Push, pull, and play add more blocks play with forces!</p>
+            <p>Push pull add more forces add more blocks and experiment with forces</p>
         </a>
 
         <a href="/pendulum" class="card">
             <div class="card-icon">
                 <svg viewBox="0 0 24 24">
-                    <line x1="12" y1="2" x2="12" y2="16" stroke-linecap="round"/>
-                    <circle cx="12" cy="2" r="1.5"/>
+                    <line x1="12" y1="2" x2="12" y2="16"/>
                     <circle cx="12" cy="18" r="3"/>
-                    <path d="M9 18 A8 8 0 0 1 15 18" stroke-dasharray="2,2"/>
                 </svg>
             </div>
             <h3>Pendulum</h3>
-            <p>A swinging ball in the air Change length, gravity, and see how time period reacts. Drag it to 360 degrees</p>
+            <p>Adjust length and gravity, and drag it to 360° to watch oscillations</p>
         </a>
 
         <a href="/incline" class="card">
             <div class="card-icon">
                 <svg viewBox="0 0 24 24">
-                    <path d="M2 20 L22 8" stroke-linecap="round" stroke-width="2"/>
+                    <path d="M2 20 L22 8" stroke-width="2"/>
                     <rect x="14" y="6" width="6" height="6" rx="1" transform="rotate(-20 17 9)"/>
-                    <path d="M2 20 L22 20" stroke-linecap="round" stroke-width="1.5"/>
                 </svg>
             </div>
             <h3>Inclined Plane</h3>
-            <p>Watch blocks sliding down incline Adjust their angles, friction, and mass to visualize it perfectly.</p>
+            <p>Watch blocks slide down adjustable inclines with friction and mass</p>
         </a>
 
         <a href="/circular" class="card">
@@ -135,12 +111,10 @@
                 <svg viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="8" stroke-width="2" fill="none"/>
                     <circle cx="12" cy="4" r="2"/>
-                    <line x1="12" y1="12" x2="12" y2="4" stroke-width="1.5"/>
-                    <path d="M12 4 Q16 4 16 8" stroke-dasharray="2,2" fill="none"/>
                 </svg>
             </div>
             <h3>Circular Motion</h3>
-            <p>Spin your objects in CIRCLES Watch centripetal force, angular velocity, and uniform circular motion in action</p>
+            <p>Spin objects and observe centripetal force, velocity, and angular motion</p>
         </a>
 
         <a href="/spring" class="card">
@@ -152,18 +126,70 @@
                             S15 15, 12 15 
                             S9 19, 12 19" 
                         stroke-width="2"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"/>
-                    <circle cx="12" cy="3" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
+                        fill="none"/>
                 </svg>
             </div>
             <h3>Spring System</h3>
-            <p>Simulate oscillations in a mass-spring system. Adjust spring constant, mass, and damping to observe SHM.</p>
+            <p>Simulate oscillations with mass, spring constant, and damping controls</p>
+        </a>
+
+        <a href="/collision" class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="8" cy="12" r="3"/>
+                    <circle cx="16" cy="12" r="3"/>
+                    <path d="M8 12 L16 12" stroke-width="2"/>
+                </svg>
+            </div>
+            <h3>Collision Simulation</h3>
+            <p>Elastic and inelastic collisions visualize momentum and energy conservation</p>
         </a>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <style>
+        /* added a dropdown menu so i could have diff tabs like mechanics electrostats etc*/
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--card-bg);
+            min-width: 220px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: var(--text);
+            padding: 10px 14px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--card-hover);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
 </body>
 </html>
