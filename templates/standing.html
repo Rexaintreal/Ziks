@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standing Waves - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/standing.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Standing Waves... ～(つˆ0ˆ)つ｡☆</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Standing Waves</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Harmonic Mode</label>
+                <select id="harmonic">
+                    <option value="1" selected>1st Harmonic (Fundamental)</option>
+                    <option value="2">2nd Harmonic</option>
+                    <option value="3">3rd Harmonic</option>
+                    <option value="4">4th Harmonic</option>
+                    <option value="5">5th Harmonic</option>
+                    <option value="6">6th Harmonic</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Boundary Conditions</label>
+                <select id="boundary">
+                    <option value="fixed" selected>Both Ends Fixed</option>
+                    <option value="free">Both Ends Free</option>
+                    <option value="mixed">One Fixed, One Free</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Frequency (Hz)</label>
+                <div class="slider-container">
+                    <input type="range" id="frequency" min="1" max="20" value="5" step="0.5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <span id="frequencyDisplay">5.0 Hz</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Amplitude</label>
+                <div class="slider-container">
+                    <input type="range" id="amplitude" min="0.2" max="2" value="1" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <span id="amplitudeDisplay">1.0</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>String Length (m)</label>
+                <div class="slider-container">
+                    <input type="range" id="stringLength" min="0.5" max="3" value="1.5" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler-horizontal"></i>
+                    <span id="stringLengthDisplay">1.5 m</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Wave Speed (m/s)</label>
+                <div class="slider-container">
+                    <input type="range" id="waveSpeed" min="10" max="100" value="50" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span id="waveSpeedDisplay">50 m/s</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showNodes" checked>
+                    <span>Show Nodes</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showAntinodes" checked>
+                    <span>Show Antinodes</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showEnvelope">
+                    <span>Show Envelope</span>
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-pause"></i> Pause
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Wave Properties</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        Wavelength
+                    </span>
+                    <span class="stat-value" id="wavelength">3.0 m</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Period
+                    </span>
+                    <span class="stat-value" id="period">0.20 s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        Number of Nodes
+                    </span>
+                    <span class="stat-value" id="nodeCount">2</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bullseye"></i>
+                        Antinodes
+                    </span>
+                    <span class="stat-value" id="antinodeCount">1</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Standing Wave Physics</h4>
+                <p><strong>Nodes:</strong> Points with zero amplitude</p>
+                <p><strong>Antinodes:</strong> Points with max amplitude</p>
+                <p><strong>λ = 2L/n</strong> (wavelength for nth harmonic)</p>
+                <p><strong>f = nv/2L</strong> (frequency formula)</p>
+                <p><strong>Drag antinodes</strong> to adjust amplitude!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/standing.js') }}"></script>
+</body>
+</html>

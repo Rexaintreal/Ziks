@@ -44,6 +44,7 @@
                 </button>
                 <div class="dropdown-content">
                     <a href="/waves"><i class="fa-solid fa-wave-square"></i> Wave Interference</a>
+                    <a href="/standing"><i class="fa-solid fa-guitar"></i> Standing Waves</a>
                 </div>
             </div>
         </div>
@@ -192,6 +193,20 @@
             <h3>Wave Interference</h3>
             <p>Create beautiful interference patterns with multiple wave sources and explore superposition</p>
         </a>
+        <a href="/standing" class="card">
+        <div class="card-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M2 12 L22 12" stroke-width="2"/>
+                <path d="M6 8 Q8 12 10 8 T14 8 T18 8" stroke-width="2" fill="none"/>
+                <circle cx="6" cy="8" r="1.5" fill="red"/>
+                <circle cx="10" cy="8" r="1.5" fill="red"/>
+                <circle cx="14" cy="8" r="1.5" fill="red"/>
+                <circle cx="18" cy="8" r="1.5" fill="red"/>
+            </svg>
+        </div>
+        <h3>Standing Waves</h3>
+        <p>Visualize harmonics, nodes, and antinodes on vibrating strings with adjustable tension</p>
+    </a>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

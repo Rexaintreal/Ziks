@@ -49,6 +49,10 @@ def rolling():
 def waves():
     return render_template('waves.html')
 
+@app.route('/standing')
+def standing():
+    return render_template('standing.html')
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)
