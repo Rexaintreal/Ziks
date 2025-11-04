@@ -40,6 +40,10 @@ def collision():
 def torque():
     return render_template('torque.html')
 
+@app.route('/rolling')
+def rolling():
+    return render_template('rolling.html')
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)
