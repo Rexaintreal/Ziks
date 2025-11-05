@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doppler Effect - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/doppler.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Doppler Effect... ～(つˆ0ˆ)つ｡☆</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Doppler Effect</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Motion Type</label>
+                <select id="motionType">
+                    <option value="linear" selected>Linear Motion</option>
+                    <option value="circular">Circular Motion</option>
+                    <option value="oscillating">Oscillating</option>
+                    <option value="custom">Custom Path (Draw)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Source Velocity (m/s)</label>
+                <div class="slider-container">
+                    <input type="range" id="sourceVelocity" min="0" max="100" value="30" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span id="velocityDisplay">30 m/s</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Wave Speed (m/s)</label>
+                <div class="slider-container">
+                    <input type="range" id="waveSpeed" min="50" max="400" value="343" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-wind"></i>
+                    <span id="waveSpeedDisplay">343 m/s</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Source Frequency (Hz)</label>
+                <div class="slider-container">
+                    <input type="range" id="sourceFrequency" min="100" max="1000" value="440" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <span id="frequencyDisplay">440 Hz</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Wave Amplitude</label>
+                <div class="slider-container">
+                    <input type="range" id="amplitude" min="0.3" max="2" value="1" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <span id="amplitudeDisplay">1.0</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Observer Position</label>
+                <select id="observerPosition">
+                    <option value="left">Left Side</option>
+                    <option value="right" selected>Right Side</option>
+                    <option value="both">Both Sides</option>
+                    <option value="drag">Draggable</option>
+                </select>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showWavefronts" checked>
+                    <span>Show Wavefronts</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showVelocityVector" checked>
+                    <span>Show Velocity Vector</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showWavelengths" checked>
+                    <span>Show Wavelengths</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="playSound">
+                    <span>Play Sound (Audio)</span>
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-pause"></i> Pause
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Observed Frequencies</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Approaching
+                    </span>
+                    <span class="stat-value" id="freqApproaching">485 Hz</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        Receding
+                    </span>
+                    <span class="stat-value" id="freqReceding">402 Hz</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        Wavelength Front
+                    </span>
+                    <span class="stat-value" id="wavelengthFront">0.91 m</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        Wavelength Back
+                    </span>
+                    <span class="stat-value" id="wavelengthBack">1.08 m</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Doppler Effect</h4>
+                <p><strong>Approaching:</strong> f' = f × c/(c - v)</p>
+                <p><strong>Receding:</strong> f' = f × c/(c + v)</p>
+                <p><strong>Wavefronts</strong> compress ahead, stretch behind</p>
+                <p><strong>Drag the source</strong> to change its path!</p>
+                <p><strong>Drag observers</strong> to move them around!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/doppler.js') }}"></script>
+</body>
+</html>

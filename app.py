@@ -53,6 +53,10 @@ def waves():
 def standing():
     return render_template('standing.html')
 
+@app.route('/doppler')
+def doppler():
+    return render_template('doppler.html')
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)
