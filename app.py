@@ -57,6 +57,11 @@ def standing():
 def doppler():
     return render_template('doppler.html')
 
+# ------------------Electrostatics Section -------------------
+@app.route('/electric')
+def electric():
+    return render_template('electric.html')
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)
