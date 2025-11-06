@@ -62,6 +62,10 @@ def doppler():
 def electric():
     return render_template('electric.html')
 
+@app.route('/capacitor')
+def capacitor():
+    return render_template('capacitor.html')
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)

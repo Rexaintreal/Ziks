@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitor Charging - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/capacitor.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading RC Circuit... ⚡</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">RC Circuit Simulator</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Circuit Mode</label>
+                <select id="circuitMode">
+                    <option value="charging">Charging</option>
+                    <option value="discharging">Discharging</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Voltage (V)</label>
+                <div class="slider-container">
+                    <input type="range" id="voltage" min="1" max="24" value="12" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span id="voltageDisplay">12 V</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Resistance (kΩ)</label>
+                <div class="slider-container">
+                    <input type="range" id="resistance" min="1" max="100" value="10" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-grip-lines"></i>
+                    <span id="resistanceDisplay">10 kΩ</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Capacitance (μF)</label>
+                <div class="slider-container">
+                    <input type="range" id="capacitance" min="10" max="1000" value="100" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span id="capacitanceDisplay">100 μF</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showCurrent" checked>
+                    <span>Show Current Flow</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGraphs" checked>
+                    <span>Show Graphs</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showEquations" checked>
+                    <span>Show Equations</span>
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-play"></i> Start
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Circuit Properties</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Time Constant (τ)
+                    </span>
+                    <span class="stat-value" id="timeConstant">0 ms</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-microchip"></i>
+                        Capacitor Voltage
+                    </span>
+                    <span class="stat-value" id="capVoltage">0 V</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-battery-half"></i>
+                        Charge Stored
+                    </span>
+                    <span class="stat-value" id="chargeStored">0 μC</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Current
+                    </span>
+                    <span class="stat-value" id="current">0 mA</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-fire"></i>
+                        Power Dissipated
+                    </span>
+                    <span class="stat-value" id="power">0 mW</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Circuit Tips</h4>
+                <p><strong>τ = RC</strong> - Time constant in seconds</p>
+                <p><strong>Charging:</strong> V(t) = V₀(1 - e^(-t/τ))</p>
+                <p><strong>Discharging:</strong> V(t) = V₀e^(-t/τ)</p>
+                <p>At <strong>1τ</strong>: 63% charged/discharged</p>
+                <p>At <strong>5τ</strong>: ~99% complete!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/capacitor.js') }}"></script>
+</body>
+</html>
