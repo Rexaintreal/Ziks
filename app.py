@@ -66,6 +66,11 @@ def electric():
 def capacitor():
     return render_template('capacitor.html')
 
+@app.route('/magnetic')
+def magnetic():
+    return render_template('magnetic.html')
+
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)

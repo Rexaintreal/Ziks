@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnetic Induction - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/magnetic.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Magnetic Induction Simulator... ⚡🧲⚡</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Faraday's Law - Magnetic Induction</span>
+            </div>
+            <div class="canvas-wrapper">
+                <div class="canvas-bg-pattern"></div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <span class="zoom-level" id="zoomDisplay">100%</span>
+                <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="zoom-btn" id="resetViewBtn" title="Reset View">
+                    <i class="fa-solid fa-maximize"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Magnet Strength (T)</label>
+                <div class="slider-container">
+                    <input type="range" id="magnetStrength" min="0.1" max="5" value="2" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-magnet"></i>
+                    <span class="angle-value" id="magnetStrengthDisplay">2.0 T</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Coil Turns (N)</label>
+                <div class="slider-container">
+                    <input type="range" id="coilTurns" min="1" max="20" value="10" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="angle-value" id="coilTurnsDisplay">10</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Coil Radius (cm)</label>
+                <div class="slider-container">
+                    <input type="range" id="coilRadius" min="30" max="100" value="50" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-circle"></i>
+                    <span class="angle-value" id="coilRadiusDisplay">5.0 cm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Magnet Velocity (m/s)</label>
+                <input type="number" id="magnetVelocity" value="0" min="-10" max="10" step="0.5">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Positive = Move Right, Negative = Move Left
+                </p>
+            </div>
+
+            <div class="control-group">
+                <label>Motion Mode</label>
+                <select id="motionMode">
+                    <option value="manual">Manual (Drag Magnet)</option>
+                    <option value="constant">Constant Velocity</option>
+                    <option value="oscillate">Oscillate</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fa-solid fa-play"></i> Start
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Electromagnetic Data</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Induced EMF (ε)
+                    </span>
+                    <span class="stat-value" id="emf">0.00 V</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-wave-square"></i>
+                        Magnetic Flux (Φ)
+                    </span>
+                    <span class="stat-value" id="flux">0.00 Wb</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        Rate of Change (dΦ/dt)
+                    </span>
+                    <span class="stat-value" id="fluxRate">0.00 Wb/s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-circle-notch"></i>
+                        Induced Current
+                    </span>
+                    <span class="stat-value" id="current">0.00 A</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-location-dot"></i>
+                        Magnet Position
+                    </span>
+                    <span class="stat-value" id="position">0.0 cm</span>
+                </div>
+            </div>
+
+            <div class="graph-section">
+                <h4>EMF vs Time</h4>
+                <canvas id="graphCanvas" width="300" height="200"></canvas>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Faraday's Law</h4>
+                <p><strong>ε = -N(dΦ/dt)</strong></p>
+                <p><strong>Φ = B·A·cos(θ)</strong></p>
+                <p>EMF induced when magnetic flux through coil changes</p>
+                <p><strong>Lenz's Law:</strong> Induced current opposes the change</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/magnetic.js') }}"></script>
+</body>
+</html>

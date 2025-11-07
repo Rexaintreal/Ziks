@@ -56,6 +56,7 @@
                 <div class="dropdown-content">
                     <a href="/electric"><i class="fa-solid fa-atom"></i> Electric Field</a>
                     <a href="/capacitor"><i class="fa-solid fa-charging-station"></i> RC Circuits</a>
+                    <a href="/magnetic"><i class="fa-solid fa-magnet"></i> Magnetic Induction</a>
                 </div>
             </div>
         </div>
@@ -257,6 +258,18 @@
         <h3>RC Circuits</h3>
         <p>Simulate capacitors charge and discharge through resistors and see exponential curves in real-time</p>
     </a>
+    <a href="/magnetic" class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M8 4 L8 20 M16 4 L16 20" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                    <path d="M12 4 Q16 8 12 12 Q8 16 12 20" stroke="#51cf66" stroke-width="2" fill="none"/>
+                    <path d="M4 12 L20 12" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="2,2"/>
+                </svg>
+            </div>
+            <h3>Magnetic Induction</h3>
+            <p>Visualize Faraday's Laws with interactive magnets and graphs</p>
+        </a>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
