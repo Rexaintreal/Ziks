@@ -70,6 +70,11 @@ def capacitor():
 def magnetic():
     return render_template('magnetic.html')
 
+#-------------------Optics----------------------------
+@app.route('/snell')
+def snell():
+    return render_template('snell.html')
+
 
 # ----------------- Running the app -----------------
 if __name__ == '__main__':

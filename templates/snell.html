@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snell's Law Studio - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/snell.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Snell's Law... (つ◕౪◕)つ━☆ﾟ.*･｡ﾟ</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Snell's Law Studio</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Medium 1 (Top)</label>
+                <select id="medium1Select">
+                    <option value="1.00">Vacuum (n = 1.00)</option>
+                    <option value="1.000293" selected>Air (n = 1.000293)</option>
+                    <option value="1.33">Water (n = 1.33)</option>
+                    <option value="1.52">Glass (n = 1.52)</option>
+                    <option value="2.42">Diamond (n = 2.42)</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <input type="number" id="medium1Custom" min="1" max="3" step="0.01" value="1.000293" style="margin-top: 0.5rem; display: none;">
+            </div>
+
+            <div class="control-group">
+                <label>Refractive Index n₁</label>
+                <div class="slider-container">
+                    <input type="range" id="n1Slider" min="1" max="2.5" value="1.000293" step="0.01">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span id="n1Display">1.00</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Medium 2 (Bottom)</label>
+                <select id="medium2Select">
+                    <option value="1.00">Vacuum (n = 1.00)</option>
+                    <option value="1.000293">Air (n = 1.000293)</option>
+                    <option value="1.33" selected>Water (n = 1.33)</option>
+                    <option value="1.52">Glass (n = 1.52)</option>
+                    <option value="2.42">Diamond (n = 2.42)</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <input type="number" id="medium2Custom" min="1" max="3" step="0.01" value="1.33" style="margin-top: 0.5rem; display: none;">
+            </div>
+
+            <div class="control-group">
+                <label>Refractive Index n₂</label>
+                <div class="slider-container">
+                    <input type="range" id="n2Slider" min="1" max="2.5" value="1.33" step="0.01">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span id="n2Display">1.33</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Incident Angle</label>
+                <div class="slider-container">
+                    <input type="range" id="angleSlider" min="0" max="89" value="30" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-angle-right"></i>
+                    <span id="angleDisplay">30°</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Light Intensity</label>
+                <div class="slider-container">
+                    <input type="range" id="intensitySlider" min="0.3" max="1" value="0.8" step="0.05">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-sun"></i>
+                    <span id="intensityDisplay">80%</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showNormals" checked>
+                    <span>Show Normals</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showAngles" checked>
+                    <span>Show Angle Measurements</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showWavefronts" checked>
+                    <span>Show Wavefronts</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showReflection" checked>
+                    <span>Show Reflection</span>
+                </label>
+            </div>
+
+            <div class="stats-section">
+                <h4>Snell's Law Calculations</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-angle-down"></i>
+                        Incident Angle (θ₁)
+                    </span>
+                    <span class="stat-value" id="theta1Value">30.0°</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-angle-up"></i>
+                        Refracted Angle (θ₂)
+                    </span>
+                    <span class="stat-value" id="theta2Value">22.1°</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Critical Angle (θc)
+                    </span>
+                    <span class="stat-value" id="criticalAngleValue">48.8°</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-wave-square"></i>
+                        Status
+                    </span>
+                    <span class="stat-value" id="statusValue">Refraction</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Snell's Law</h4>
+                <p><strong>n₁ sin(θ₁) = n₂ sin(θ₂)</strong></p>
+                <p><strong>Critical Angle:</strong> θc = sin⁻¹(n₂/n₁)</p>
+                <p><strong>Drag the light source</strong> to change incident angle!</p>
+                <p><strong>Total Internal Reflection</strong> occurs when θ₁ > θc</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn btn-secondary" id="preset1">
+                    <i class="fa-solid fa-water"></i> Air → Water
+                </button>
+                <button class="btn btn-secondary" id="preset2">
+                    <i class="fa-solid fa-gem"></i> Air → Diamond
+                </button>
+                <button class="btn btn-secondary" id="preset3">
+                    <i class="fa-solid fa-arrows-rotate"></i> Water → Air
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/snell.js') }}"></script>
+</body>
+</html>
