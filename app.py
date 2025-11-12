@@ -79,6 +79,10 @@ def snell():
 def lenses():
     return render_template('lenses.html')
 
+@app.route('/diffraction')
+def diffraction():
+    return render_template('diffraction.html')
+
 
 # ----------------- Running the app -----------------
 if __name__ == '__main__':

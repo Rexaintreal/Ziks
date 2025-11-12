@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Slit Diffraction - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/diffraction.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Diffraction Simulator... (❁´◡`❁)</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Double Slit Diffraction & Interference</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+                <div class="wavelength-indicator" id="wavelengthIndicator">
+                    <div class="wavelength-bar"></div>
+                    <span class="wavelength-label">Wavelength</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Wavelength (λ) - nm</label>
+                <div class="slider-container">
+                    <input type="range" id="wavelengthSlider" min="380" max="750" value="550" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <span id="wavelengthDisplay">550 nm</span>
+                    <div class="color-preview" id="colorPreview"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Slit Separation (d) - μm</label>
+                <div class="slider-container">
+                    <input type="range" id="slitSeparationSlider" min="10" max="500" value="100" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                    <span id="slitSeparationDisplay">100 μm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Slit Width (a) - μm</label>
+                <div class="slider-container">
+                    <input type="range" id="slitWidthSlider" min="5" max="100" value="25" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler"></i>
+                    <span id="slitWidthDisplay">25 μm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Screen Distance (L) - cm</label>
+                <div class="slider-container">
+                    <input type="range" id="screenDistanceSlider" min="50" max="300" value="150" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler-horizontal"></i>
+                    <span id="screenDistanceDisplay">150 cm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Intensity Scale</label>
+                <div class="slider-container">
+                    <input type="range" id="intensitySlider" min="50" max="200" value="100" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-sun"></i>
+                    <span id="intensityDisplay">100%</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showSlits" checked>
+                    <span>Show Double Slits</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showRays" checked>
+                    <span>Show Light Rays</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGraph" checked>
+                    <span>Show Intensity Graph</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showMaxima" checked>
+                    <span>Show Maxima/Minima</span>
+                </label>
+            </div>
+
+            <div class="stats-section">
+                <h4>Pattern Analysis</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrows-alt-h"></i>
+                        Fringe Spacing (β)
+                    </span>
+                    <span class="stat-value" id="fringeSpacingValue">0.83 mm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-eye"></i>
+                        Angular Width (θ)
+                    </span>
+                    <span class="stat-value" id="angularWidthValue">0.32°</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        Central Maximum
+                    </span>
+                    <span class="stat-value" id="centralMaxValue">100%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-chart-line"></i>
+                        Visible Maxima
+                    </span>
+                    <span class="stat-value" id="visibleMaximaValue">15</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-book"></i> Theory</h4>
+                <p><strong>Double Slit Equation:</strong></p>
+                <p>β = λL/d</p>
+                <p><strong>Intensity Pattern:</strong></p>
+                <p>I = I₀ cos²(πd sinθ/λ) × [sin(πa sinθ/λ)/(πa sinθ/λ)]²</p>
+                <p><strong>Maxima Position:</strong> d sinθ = mλ</p>
+                <p><strong>Minima Position:</strong> d sinθ = (m+½)λ</p>
+                <p class="tip">💡 <strong>Tip:</strong> Decrease slit separation to see wider fringes!</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn btn-secondary" id="preset1">
+                    <i class="fa-solid fa-circle" style="color: #ff0000;"></i> Red Light (650 nm)
+                </button>
+                <button class="btn btn-secondary" id="preset2">
+                    <i class="fa-solid fa-circle" style="color: #00ff00;"></i> Green Light (530 nm)
+                </button>
+                <button class="btn btn-secondary" id="preset3">
+                    <i class="fa-solid fa-circle" style="color: #0000ff;"></i> Blue Light (450 nm)
+                </button>
+                <button class="btn btn-secondary" id="preset4">
+                    <i class="fa-solid fa-compress"></i> Narrow Slits
+                </button>
+                <button class="btn btn-secondary" id="preset5">
+                    <i class="fa-solid fa-expand"></i> Wide Slits
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/diffraction.js') }}"></script>
+</body>
+</html>
