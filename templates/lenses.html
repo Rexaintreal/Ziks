@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenses & Image Formation - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lenses.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Lens Simulator... (◕‿◕)つ━☆</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Lenses & Image Formation</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Lens Type</label>
+                <div class="lens-type-buttons">
+                    <button class="btn-lens-type convex active" id="convexBtn">
+                        <i class="fa-solid fa-circle"></i> Convex (Converging)
+                    </button>
+                    <button class="btn-lens-type concave" id="concaveBtn">
+                        <i class="fa-solid fa-circle"></i> Concave (Diverging)
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Focal Length (cm)</label>
+                <div class="slider-container">
+                    <input type="range" id="focalLengthSlider" min="50" max="250" value="150" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler"></i>
+                    <span id="focalLengthDisplay">150 cm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Object Distance (cm)</label>
+                <div class="slider-container">
+                    <input type="range" id="objectDistanceSlider" min="50" max="500" value="300" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                    <span id="objectDistanceDisplay">300 cm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Object Height (cm)</label>
+                <div class="slider-container">
+                    <input type="range" id="objectHeightSlider" min="20" max="100" value="60" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <span id="objectHeightDisplay">60 cm</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showPrincipalAxis" checked>
+                    <span>Show Principal Axis</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showFocalPoints" checked>
+                    <span>Show Focal Points</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showRays" checked>
+                    <span>Show Ray Diagram</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGrid" checked>
+                    <span>Show Grid</span>
+                </label>
+            </div>
+
+            <div class="stats-section">
+                <h4>Image Properties</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-location-dot"></i>
+                        Image Distance (v)
+                    </span>
+                    <span class="stat-value" id="imageDistanceValue">150 cm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-up-down"></i>
+                        Image Height (h')
+                    </span>
+                    <span class="stat-value" id="imageHeightValue">30 cm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Magnification (m)
+                    </span>
+                    <span class="stat-value" id="magnificationValue">0.5×</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-eye"></i>
+                        Image Type
+                    </span>
+                    <span class="stat-value image-type" id="imageTypeValue">Real, Inverted</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-info-circle"></i>
+                        Image Nature
+                    </span>
+                    <span class="stat-value image-nature" id="imageNatureValue">Diminished</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-lightbulb"></i> Lens Formulas</h4>
+                <p><strong>Lens Equation:</strong> 1/f = 1/v - 1/u</p>
+                <p><strong>Magnification:</strong> m = v/u = h'/h</p>
+                <p><strong>Sign Convention:</strong></p>
+                <p>• Distances measured from optical center</p>
+                <p>• Real images: positive v</p>
+                <p>• Virtual images: negative v</p>
+                <p><strong>Drag the object</strong> to move it!</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn btn-secondary" id="preset1">
+                    <i class="fa-solid fa-camera"></i> Camera (u > 2f)
+                </button>
+                <button class="btn btn-secondary" id="preset2">
+                    <i class="fa-solid fa-eye"></i> Eye (f < u < 2f)
+                </button>
+                <button class="btn btn-secondary" id="preset3">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i> Magnifier (u < f)
+                </button>
+                <button class="btn btn-secondary" id="preset4">
+                    <i class="fa-solid fa-glasses"></i> Concave Lens
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lenses.js') }}"></script>
+</body>
+</html>

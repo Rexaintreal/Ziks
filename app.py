@@ -75,6 +75,10 @@ def magnetic():
 def snell():
     return render_template('snell.html')
 
+@app.route('/lenses')
+def lenses():
+    return render_template('lenses.html')
+
 
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
