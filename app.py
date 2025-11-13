@@ -84,6 +84,12 @@ def diffraction():
     return render_template('diffraction.html')
 
 
+#---------------------Heat and Thermodynamics--------
+@app.route('/thermal')
+def thermal():
+    return render_template('thermal.html')
+
+
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
     app.run(debug=True)

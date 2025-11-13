@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Expansion - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/thermal.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Thermal Expansion Simulator... o((>ω< ))o</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Thermal Expansion Simulator</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+                <div class="thermometer-display" id="thermometerDisplay">
+                    <div class="thermometer">
+                        <div class="thermometer-bulb"></div>
+                        <div class="thermometer-tube">
+                            <div class="mercury" id="mercuryLevel"></div>
+                            <div class="scale-marks">
+                                <span>100°C</span>
+                                <span>75°C</span>
+                                <span>50°C</span>
+                                <span>25°C</span>
+                                <span>0°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="temp-reading" id="tempReading">20°C</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Material Type</label>
+                <div class="material-buttons">
+                    <button class="btn-material active" data-material="aluminum" id="aluminumBtn">
+                        <i class="fa-solid fa-cube"></i> Aluminum
+                    </button>
+                    <button class="btn-material" data-material="iron" id="ironBtn">
+                        <i class="fa-solid fa-cube"></i> Iron
+                    </button>
+                    <button class="btn-material" data-material="copper" id="copperBtn">
+                        <i class="fa-solid fa-cube"></i> Copper
+                    </button>
+                    <button class="btn-material" data-material="steel" id="steelBtn">
+                        <i class="fa-solid fa-cube"></i> Steel
+                    </button>
+                    <button class="btn-material" data-material="brass" id="brassBtn">
+                        <i class="fa-solid fa-cube"></i> Brass
+                    </button>
+                    <button class="btn-material" data-material="glass" id="glassBtn">
+                        <i class="fa-solid fa-wine-glass"></i> Glass
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Expansion Type</label>
+                <div class="expansion-buttons">
+                    <button class="btn-expansion active" data-type="linear" id="linearBtn">
+                        <i class="fa-solid fa-ruler-horizontal"></i> Linear
+                    </button>
+                    <button class="btn-expansion" data-type="area" id="areaBtn">
+                        <i class="fa-solid fa-square"></i> Area
+                    </button>
+                    <button class="btn-expansion" data-type="volume" id="volumeBtn">
+                        <i class="fa-solid fa-cube"></i> Volume
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Temperature (°C)</label>
+                <div class="slider-container">
+                    <input type="range" id="temperatureSlider" min="-50" max="500" value="20" step="1">
+                </div>
+                <div class="value-display temperature-display">
+                    <i class="fa-solid fa-temperature-half"></i>
+                    <span id="temperatureDisplay">20°C</span>
+                    <span class="temp-kelvin" id="kelvinDisplay">293 K</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Initial Length/Dimension (cm)</label>
+                <div class="slider-container">
+                    <input type="range" id="lengthSlider" min="10" max="100" value="50" step="5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-ruler"></i>
+                    <span id="lengthDisplay">50 cm</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Heating Rate (°C/s)</label>
+                <div class="slider-container">
+                    <input type="range" id="heatingRateSlider" min="0.5" max="10" value="2" step="0.5">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-fire"></i>
+                    <span id="heatingRateDisplay">2.0 °C/s</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGrid" checked>
+                    <span>Show Grid</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showDimensions" checked>
+                    <span>Show Dimensions</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGraph" checked>
+                    <span>Show Expansion Graph</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showParticles">
+                    <span>Show Particle Motion</span>
+                </label>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-action" id="heatBtn">
+                    <i class="fa-solid fa-fire"></i> Start Heating
+                </button>
+                <button class="btn btn-action" id="coolBtn">
+                    <i class="fa-solid fa-snowflake"></i> Start Cooling
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Expansion Data</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-atom"></i>
+                        Coefficient (α/β/γ)
+                    </span>
+                    <span class="stat-value" id="coefficientValue">23.1 × 10⁻⁶ /°C</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrows-alt-h"></i>
+                        Change in Dimension (ΔL)
+                    </span>
+                    <span class="stat-value" id="deltaLValue">0.0 mm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-percent"></i>
+                        Relative Change (ΔL/L₀)
+                    </span>
+                    <span class="stat-value" id="relativeChangeValue">0.00%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-ruler-combined"></i>
+                        Final Dimension
+                    </span>
+                    <span class="stat-value" id="finalDimensionValue">50.0 cm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-temperature-arrow-up"></i>
+                        ΔT (Change)
+                    </span>
+                    <span class="stat-value" id="deltaTValue">0°C</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-book"></i> Thermal Expansion</h4>
+                <p><strong>Linear Expansion:</strong></p>
+                <p>ΔL = α × L₀ × ΔT</p>
+                <p><strong>Area Expansion:</strong></p>
+                <p>ΔA = β × A₀ × ΔT (β ≈ 2α)</p>
+                <p><strong>Volume Expansion:</strong></p>
+                <p>ΔV = γ × V₀ × ΔT (γ ≈ 3α)</p>
+                <p class="tip"><strong>Tip:</strong> Different materials expand at different rates!</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn btn-secondary" id="preset1">
+                    <i class="fa-solid fa-bridge"></i> Bridge Expansion
+                </button>
+                <button class="btn btn-secondary" id="preset2">
+                    <i class="fa-solid fa-train"></i> Railway Track
+                </button>
+                <button class="btn btn-secondary" id="preset3">
+                    <i class="fa-solid fa-flask"></i> Lab Experiment
+                </button>
+                <button class="btn btn-secondary" id="preset4">
+                    <i class="fa-solid fa-ice-cream"></i> Extreme Cold
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/thermal.js') }}"></script>
+</body>
+</html>
