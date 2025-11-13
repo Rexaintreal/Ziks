@@ -102,6 +102,28 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <label>Number of Slits</label>
+                <div class="slider-container">
+                    <input type="range" id="numSlitsSlider" min="1" max="8" value="2" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span id="numSlitsDisplay">2</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Animation Speed</label>
+                <div class="slider-container">
+                    <input type="range" id="animationSpeedSlider" min="0.1" max="3" value="1" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-gauge"></i>
+                    <span id="animationSpeedDisplay">1.0x</span>
+                </div>
+            </div>
+
             <div class="control-group checkbox-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="showSlits" checked>
@@ -161,7 +183,7 @@
                 <p>I = I₀ cos²(πd sinθ/λ) × [sin(πa sinθ/λ)/(πa sinθ/λ)]²</p>
                 <p><strong>Maxima Position:</strong> d sinθ = mλ</p>
                 <p><strong>Minima Position:</strong> d sinθ = (m+½)λ</p>
-                <p class="tip">💡 <strong>Tip:</strong> Decrease slit separation to see wider fringes!</p>
+                <p class="tip"><strong>Tip:</strong> Decrease slit separation to see wider fringes!</p>
             </div>
 
             <div class="preset-buttons">
