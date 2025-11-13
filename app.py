@@ -89,6 +89,10 @@ def diffraction():
 def thermal():
     return render_template('thermal.html')
 
+@app.route('/gaslaws')
+def gaslaws():
+    return render_template('gaslaws.html')
+
 
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
