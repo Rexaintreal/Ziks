@@ -553,7 +553,7 @@ function draw() {
     ctx.globalAlpha = 0.6;
     ctx.font = '11px Inter';
     ctx.textAlign = 'left';
-    ctx.fillText('🌡️ Use sliders or heating buttons to change temperature', 10, canvas.height - 20);
+    ctx.fillText('Use sliders or heating buttons to change temperature', 10, canvas.height - 20);
     ctx.globalAlpha = 1;
 }
 
