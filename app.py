@@ -93,6 +93,11 @@ def thermal():
 def gaslaws():
     return render_template('gaslaws.html')
 
+#-------------------Modern Physics-------------------
+@app.route('/photoelectric')
+def photoelectric():
+    return render_template('photoelectric.html')
+
 
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
