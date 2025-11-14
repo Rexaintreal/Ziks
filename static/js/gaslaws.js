@@ -1,4 +1,4 @@
-// init gases
+// init gas prop
 const gases = {
     helium: { name: 'Helium (He)', molarMass: 4.003, a: 0.0346, b: 0.0238, color: '#ffd43b', radius: 3 },
     nitrogen: { name: 'Nitrogen (N₂)', molarMass: 28.014, a: 1.370, b: 0.0387, color: '#4dabf7', radius: 4 },
@@ -8,8 +8,9 @@ const gases = {
     hydrogen: { name: 'Hydrogen (H₂)', molarMass: 2.016, a: 0.2476, b: 0.0265, color: '#51cf66', radius: 2.5 }
 };
 
-const R = 8.314; // gas const
-const N_A = 6.022e23; // avagadro
+const R = 8.314; // uni gas const
+const N_A = 6.022e23; // avagadros num
+
 let currentGas = 'helium';
 let gasModel = 'ideal'; 
 let temperature = 273; 
@@ -30,7 +31,7 @@ let colorBySpeed = true;
 let trails = [];
 let collisionEffects = [];
 let isDragging = false;
-let dragTarget = null;
+let dragTarget = null; 
 let dragStart = { x: 0, y: 0 };
 let hoverState = { right: false, bottom: false, corner: false };
 let pressure = 101.3; 
@@ -40,6 +41,8 @@ let kineticEnergy = 0;
 let meanFreePath = 0;
 let collisionRate = 0;
 let totalCollisions = 0;
+
+
 
 window.addEventListener('load', () => {
     setTimeout(() => {
@@ -65,7 +68,6 @@ function resizeCanvas() {
     initializeParticles();
     draw();
 }
-
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 const temperatureSlider = document.getElementById('temperatureSlider');
@@ -81,8 +83,6 @@ document.querySelectorAll('.btn-model').forEach(btn => {
         draw();
     });
 });
-
-
 document.querySelectorAll('.btn-gas').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.btn-gas').forEach(b => b.classList.remove('active'));
@@ -93,7 +93,6 @@ document.querySelectorAll('.btn-gas').forEach(btn => {
         draw();
     });
 });
-
 temperatureSlider?.addEventListener('input', () => {
     temperature = parseFloat(temperatureSlider.value);
     updateDisplay();
@@ -119,8 +118,6 @@ particleSlider?.addEventListener('input', () => {
     updateDisplay();
     initializeParticles();
 });
-
-
 document.getElementById('showVectors')?.addEventListener('change', (e) => {
     showVectors = e.target.checked;
 });
@@ -141,7 +138,6 @@ document.getElementById('showCollisions')?.addEventListener('change', (e) => {
 document.getElementById('colorBySpeed')?.addEventListener('change', (e) => {
     colorBySpeed = e.target.checked;
 });
-
 document.getElementById('playPauseBtn')?.addEventListener('click', function() {
     isPaused = !isPaused;
     this.innerHTML = isPaused ? 
@@ -230,7 +226,6 @@ document.getElementById('preset6')?.addEventListener('click', () => {
     temperature = 400;
     volume = 15;
     moles = 2;
-    
     temperatureSlider.value = temperature;
     volumeSlider.value = volume;
     molesSlider.value = moles;
@@ -239,7 +234,6 @@ document.getElementById('preset6')?.addEventListener('click', () => {
     updateDisplay();
     calculateProperties();
 });
-
 canvas.addEventListener('mousedown', (e) => {
     const pos = getMousePos(e);
     checkHover(pos.x, pos.y);
@@ -256,18 +250,15 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
     const pos = getMousePos(e);
-    
     if (isDragging) {
         const dx = pos.x - dragStart.x;
         const dy = pos.y - dragStart.y;
-        
         if (dragTarget === 'right' || dragTarget === 'corner') {
             containerWidth = Math.max(200, Math.min(canvas.width - containerX - 50, containerWidth + dx));
         }
         if (dragTarget === 'bottom' || dragTarget === 'corner') {
             containerHeight = Math.max(200, Math.min(canvas.height - containerY - 50, containerHeight + dy));
         }
-        
         const baseSize = 400;
         const newVolume = 22.4 * (containerWidth / baseSize) * (containerHeight / baseSize);
         volume = Math.max(5, Math.min(50, newVolume));
@@ -313,7 +304,6 @@ function checkHover(x, y) {
     const rightEdge = containerX + containerWidth;
     const bottomEdge = containerY + containerHeight;
     const tolerance = 15;
-    
     hoverState.right = Math.abs(x - rightEdge) < tolerance && 
                        y > containerY && y < bottomEdge;
     hoverState.bottom = Math.abs(y - bottomEdge) < tolerance && 
@@ -325,14 +315,21 @@ function checkHover(x, y) {
 function initializeParticles() {
     particles = [];
     const gas = gases[currentGas];
-    
+    const margin = gas.radius * 2; 
     for (let i = 0; i < particleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = getMaxwellBoltzmannSpeed();
+        let x, y;
+        let attempts = 0;
+        do {
+            x = containerX + margin + Math.random() * (containerWidth - margin * 2);
+            y = containerY + margin + Math.random() * (containerHeight - margin * 2);
+            attempts++;
+        } while (attempts < 100 && !isPositionValid(x, y, particles, gas.radius));
         
         particles.push({
-            x: containerX + Math.random() * (containerWidth - gas.radius * 2) + gas.radius,
-            y: containerY + Math.random() * (containerHeight - gas.radius * 2) + gas.radius,
+            x: x,
+            y: y,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             radius: gas.radius,
@@ -341,18 +338,24 @@ function initializeParticles() {
     }
 }
 
+function isPositionValid(x, y, existingParticles, radius) {
+    for (let p of existingParticles) {
+        const dist = Math.hypot(x - p.x, y - p.y);
+        if (dist < radius + p.radius + 5) return false;
+    }
+    return true;
+}
+
 function getMaxwellBoltzmannSpeed() {
-    // Maxwell boltzmann distribution
-    // vrms = underroot(3rt/m)
+    // maxwell boltzman distribution
+    // vrms = root(3RT/M)
     const gas = gases[currentGas];
-    const M = gas.molarMass / 1000;
+    const M = gas.molarMass / 1000; 
     const v_rms = Math.sqrt(3 * R * temperature / M);
-    
-    // Using box muller transform for normal distribution
     const u1 = Math.random();
     const u2 = Math.random();
     const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-    return Math.abs(v_rms * (0.5 + z * 0.3) * 0.1); 
+    return Math.abs(v_rms * (0.5 + z * 0.2) * 0.02); 
 }
 
 function updateParticleVelocities() {
@@ -384,26 +387,24 @@ function calculateProperties() {
     const V_m3 = volume / 1000; 
     
     if (gasModel === 'ideal') {
-        // pv=nrt
+        // for ideal gas pv=nrt
         pressure = (moles * R * temperature) / V_m3 / 1000; 
     } else {
-        // vanderwall (p + a(n/V)square)(V - nb) = nRT
+        //vander wall (P + a(n/V)square)(V - nb) = nRT
         const gas = gases[currentGas];
         const a = gas.a;
         const b = gas.b / 1000; 
         pressure = ((moles * R * temperature) / (V_m3 - moles * b) - a * Math.pow(moles / V_m3, 2)) / 1000;
     }
-    
     const gas = gases[currentGas];
     const M = gas.molarMass / 1000; 
     density = (moles * M) / V_m3; 
-
-    rmsSpeed = Math.sqrt(3 * R * temperature / M); 
+    rmsSpeed = Math.sqrt(3 * R * temperature / M);
     kineticEnergy = (3/2) * moles * R * temperature / 1000; 
     const molecularDiameter = gas.radius * 2 * 1e-10; 
     const numberDensity = (moles * N_A) / V_m3;
-    meanFreePath = 1 / (Math.sqrt(2) * Math.PI * molecularDiameter * molecularDiameter * numberDensity) * 1e9;
-    collisionRate = (numberDensity * rmsSpeed * Math.PI * molecularDiameter * molecularDiameter) / 1e9;
+    meanFreePath = 1 / (Math.sqrt(2) * Math.PI * molecularDiameter * molecularDiameter * numberDensity) * 1e9; 
+    collisionRate = (numberDensity * rmsSpeed * Math.PI * molecularDiameter * molecularDiameter) / 1e9; 
     document.getElementById('pressureValue').textContent = pressure.toFixed(1) + ' kPa';
     document.getElementById('volumeValue').textContent = volume.toFixed(1) + ' L';
     document.getElementById('temperatureValue').textContent = temperature.toFixed(0) + ' K';
@@ -421,28 +422,37 @@ function updatePhysics() {
     if (isPaused) return;
     
     const gas = gases[currentGas];
+    const damping = 0.999; 
     
     particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x - p.radius < containerX) {
-            p.x = containerX + p.radius;
-            p.vx = Math.abs(p.vx);
+        const timeStep = 0.5;
+        p.x += p.vx * timeStep;
+        p.y += p.vy * timeStep;
+        p.vx *= damping;
+        p.vy *= damping;
+        const leftWall = containerX + p.radius;
+        const rightWall = containerX + containerWidth - p.radius;
+        const topWall = containerY + p.radius;
+        const bottomWall = containerY + containerHeight - p.radius;
+        
+        if (p.x < leftWall) {
+            p.x = leftWall;
+            p.vx = Math.abs(p.vx) * 0.9;
             if (showCollisions) addCollisionEffect(p.x, p.y);
         }
-        if (p.x + p.radius > containerX + containerWidth) {
-            p.x = containerX + containerWidth - p.radius;
-            p.vx = -Math.abs(p.vx);
+        if (p.x > rightWall) {
+            p.x = rightWall;
+            p.vx = -Math.abs(p.vx) * 0.9;
             if (showCollisions) addCollisionEffect(p.x, p.y);
         }
-        if (p.y - p.radius < containerY) {
-            p.y = containerY + p.radius;
-            p.vy = Math.abs(p.vy);
+        if (p.y < topWall) {
+            p.y = topWall;
+            p.vy = Math.abs(p.vy) * 0.9;
             if (showCollisions) addCollisionEffect(p.x, p.y);
         }
-        if (p.y + p.radius > containerY + containerHeight) {
-            p.y = containerY + containerHeight - p.radius;
-            p.vy = -Math.abs(p.vy);
+        if (p.y > bottomWall) {
+            p.y = bottomWall;
+            p.vy = -Math.abs(p.vy) * 0.9;
             if (showCollisions) addCollisionEffect(p.x, p.y);
         }
         for (let j = i + 1; j < particles.length; j++) {
@@ -454,13 +464,14 @@ function updatePhysics() {
             if (dist < p.radius + p2.radius) {
                 const nx = dx / dist;
                 const ny = dy / dist;
-                
                 const dvx = p2.vx - p.vx;
                 const dvy = p2.vy - p.vy;
                 const dvn = dvx * nx + dvy * ny;
-                
+            
+
+
                 if (dvn < 0) {
-                    const impulse = 2 * dvn / 2;
+                    const impulse = 2 * dvn / 2; 
                     p.vx += impulse * nx;
                     p.vy += impulse * ny;
                     p2.vx -= impulse * nx;
@@ -476,23 +487,14 @@ function updatePhysics() {
                 }
             }
         }
-    
-        
-
         if (showTrails) {
             trails.push({ x: p.x, y: p.y, life: 30 });
         }
     });
-
-
-
     trails = trails.filter(t => {
         t.life--;
         return t.life > 0;
     });
-    
-    
-
     collisionEffects = collisionEffects.filter(e => {
         e.life--;
         e.radius += 0.5;
@@ -521,7 +523,6 @@ function getSpeedColor(speed) {
 
 function getThemeColors() {
     const isDark = document.body.getAttribute('data-theme') === 'dark';
-    
     return {
         bg: isDark ? '#0a0a0a' : '#f8f9fa',
         text: isDark ? '#ffffff' : '#000000',
@@ -538,33 +539,26 @@ function getThemeColors() {
 
 function draw() {
     if (!canvas || !ctx) return;
-    
     const colors = getThemeColors();
-    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = colors.bg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
     ctx.fillStyle = colors.container;
     ctx.fillRect(containerX, containerY, containerWidth, containerHeight);
-    
     ctx.strokeStyle = colors.containerBorder;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.strokeRect(containerX, containerY, containerWidth, containerHeight);
-    
-    
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(containerX + 2, containerY + 2, containerWidth - 4, containerHeight - 4);
     if (hoverState.right || hoverState.bottom || hoverState.corner || isDragging) {
         ctx.fillStyle = colors.handle;
-        ctx.globalAlpha = 0.6;
-        
-        
-        ctx.fillRect(containerX + containerWidth - 5, containerY + containerHeight / 2 - 20, 10, 40);
-        
-        
-        ctx.fillRect(containerX + containerWidth / 2 - 20, containerY + containerHeight - 5, 40, 10);
-        
-        
-        ctx.fillRect(containerX + containerWidth - 10, containerY + containerHeight - 10, 20, 20);
+        ctx.globalAlpha = 0.8;
+        const rightX = containerX + containerWidth;
+        ctx.fillRect(rightX - 3, containerY + containerHeight / 2 - 25, 6, 50);
+        const bottomY = containerY + containerHeight;
+        ctx.fillRect(containerX + containerWidth / 2 - 25, bottomY - 3, 50, 6);
+        ctx.fillRect(rightX - 8, bottomY - 8, 16, 16);
         
         ctx.globalAlpha = 1;
     }
@@ -588,14 +582,18 @@ function draw() {
         ctx.globalAlpha = 1;
     });
     particles.forEach(p => {
+        p.x = Math.max(containerX + p.radius, Math.min(containerX + containerWidth - p.radius, p.x));
+        p.y = Math.max(containerY + p.radius, Math.min(containerY + containerHeight - p.radius, p.y));
         const speed = Math.hypot(p.vx, p.vy);
         ctx.fillStyle = colorBySpeed ? getSpeedColor(speed) : colors.particle;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = colorBySpeed ? getSpeedColor(speed) : colors.particle;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
-        
+        ctx.shadowBlur = 0;
         ctx.strokeStyle = colors.containerBorder;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 0.5;
         ctx.stroke();
         if (showVectors) {
             const vectorScale = 3;
@@ -625,7 +623,6 @@ function draw() {
     ctx.textAlign = 'center';
     ctx.fillText(`${gases[currentGas].name} - ${gasModel === 'ideal' ? 'Ideal Gas' : 'Van der Waals'}`, 
                  containerX + containerWidth / 2, containerY - 10);
-    
     ctx.globalAlpha = 0.6;
     ctx.font = '11px Inter';
     ctx.textAlign = 'left';
@@ -639,7 +636,6 @@ function drawSpeedDistribution(colors) {
     const graphY = containerY + containerHeight + 40;
     const graphWidth = 250;
     const graphHeight = 120;
-    
     if (graphY + graphHeight > canvas.height - 30) return;
     ctx.fillStyle = colors.bg;
     ctx.strokeStyle = colors.border;
@@ -655,12 +651,10 @@ function drawSpeedDistribution(colors) {
     const maxSpeed = Math.max(...speeds);
     const binSize = maxSpeed / bins;
     const histogram = new Array(bins).fill(0);
-    
     speeds.forEach(speed => {
         const bin = Math.min(Math.floor(speed / binSize), bins - 1);
         histogram[bin]++;
     });
-    
     const maxCount = Math.max(...histogram);
     const barWidth = (graphWidth - 40) / bins;
     histogram.forEach((count, i) => {
@@ -687,22 +681,18 @@ function drawSpeedDistribution(colors) {
     ctx.rotate(-Math.PI / 2);
     ctx.fillText('Count', 0, 0);
     ctx.restore();
-    
-    // Maxwell boltzmann curve
     ctx.strokeStyle = colors.particle;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    
     const gas = gases[currentGas];
     const M = gas.molarMass / 1000;
-    const kB = 1.381e-23; //boltz const
+    const kB = 1.381e-23;//boltz const
     const m = M / N_A; 
     
     for (let i = 0; i <= 100; i++) {
         const v = (maxSpeed * i) / 100;
         const f = 4 * Math.PI * Math.pow(m / (2 * Math.PI * kB * temperature), 1.5) * 
                   v * v * Math.exp(-m * v * v / (2 * kB * temperature));
-        
         const normalized = f * particles.length * binSize * 1e5;
         const y = graphY + graphHeight - 20 - (normalized / maxCount) * (graphHeight - 40);
         const x = graphX + 20 + (i / 100) * (graphWidth - 40);
