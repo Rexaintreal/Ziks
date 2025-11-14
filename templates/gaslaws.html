@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Laws Visualizer - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gaslaws.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Gas Laws Simulator... q(≧▽≦q)</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Gas Laws Visualizer (PV = nRT)</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+                <div class="gas-info-panel" id="gasInfoPanel">
+                    <div class="info-item">
+                        <span class="info-label">Pressure (P)</span>
+                        <span class="info-value" id="pressureValue">101.3 kPa</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Volume (V)</span>
+                        <span class="info-value" id="volumeValue">22.4 L</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Temperature (T)</span>
+                        <span class="info-value" id="temperatureValue">273 K</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Moles (n)</span>
+                        <span class="info-value" id="molesValue">1.0 mol</span>
+                    </div>
+                    <div class="info-item highlight">
+                        <span class="info-label">Avg Speed</span>
+                        <span class="info-value" id="speedValue">450 m/s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Gas Model</label>
+                <div class="model-buttons">
+                    <button class="btn-model active" data-model="ideal" id="idealBtn">
+                        <i class="fa-solid fa-atom"></i> Ideal Gas
+                    </button>
+                    <button class="btn-model" data-model="vanderwaals" id="vanderwaalsBtn">
+                        <i class="fa-solid fa-flask"></i> Van der Waals
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Gas Type</label>
+                <div class="gas-type-buttons">
+                    <button class="btn-gas active" data-gas="helium">He</button>
+                    <button class="btn-gas" data-gas="nitrogen">N₂</button>
+                    <button class="btn-gas" data-gas="oxygen">O₂</button>
+                    <button class="btn-gas" data-gas="co2">CO₂</button>
+                    <button class="btn-gas" data-gas="argon">Ar</button>
+                    <button class="btn-gas" data-gas="hydrogen">H₂</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Temperature (K)</label>
+                <div class="slider-container">
+                    <input type="range" id="temperatureSlider" min="50" max="1000" value="273" step="1">
+                </div>
+                <div class="value-display temperature-display">
+                    <i class="fa-solid fa-temperature-half"></i>
+                    <span id="tempDisplay">273 K</span>
+                    <span class="temp-celsius" id="celsiusDisplay">0°C</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Volume (L) - Drag Container Walls</label>
+                <div class="slider-container">
+                    <input type="range" id="volumeSlider" min="5" max="50" value="22.4" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-cube"></i>
+                    <span id="volumeDisplay">22.4 L</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Number of Moles (n)</label>
+                <div class="slider-container">
+                    <input type="range" id="molesSlider" min="0.1" max="5" value="1" step="0.1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-vial"></i>
+                    <span id="molesDisplay">1.0 mol</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Particle Count</label>
+                <div class="slider-container">
+                    <input type="range" id="particleSlider" min="10" max="200" value="50" step="10">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-circle"></i>
+                    <span id="particleDisplay">50</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showVectors" checked>
+                    <span>Show Velocity Vectors</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showTrails">
+                    <span>Show Particle Trails</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showDistribution" checked>
+                    <span>Show Speed Distribution</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showCollisions">
+                    <span>Show Collision Effects</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="colorBySpeed" checked>
+                    <span>Color by Speed</span>
+                </label>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-action" id="playPauseBtn">
+                    <i class="fa-solid fa-pause"></i> Pause Simulation
+                </button>
+                <button class="btn btn-action" id="heatBtn">
+                    <i class="fa-solid fa-fire"></i> Heat Gas
+                </button>
+                <button class="btn btn-action" id="coolBtn">
+                    <i class="fa-solid fa-snowflake"></i> Cool Gas
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Gas Properties</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-compress"></i>
+                        Pressure (P)
+                    </span>
+                    <span class="stat-value" id="pressureStat">101.3 kPa</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-weight-hanging"></i>
+                        Density (ρ)
+                    </span>
+                    <span class="stat-value" id="densityStat">1.29 kg/m³</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        RMS Speed (v_rms)
+                    </span>
+                    <span class="stat-value" id="rmsSpeedStat">450 m/s</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Kinetic Energy
+                    </span>
+                    <span class="stat-value" id="kineticEnergyStat">3.40 kJ</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-arrows-alt"></i>
+                        Mean Free Path
+                    </span>
+                    <span class="stat-value" id="meanFreePathStat">68 nm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-chart-line"></i>
+                        Collision Rate
+                    </span>
+                    <span class="stat-value" id="collisionRateStat">6.6 × 10⁹ /s</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-book"></i> Gas Laws</h4>
+                <p><strong>Ideal Gas Law:</strong></p>
+                <p>PV = nRT</p>
+                <p><strong>Van der Waals:</strong></p>
+                <p>(P + a(n/V)²)(V - nb) = nRT</p>
+                <p><strong>RMS Speed:</strong></p>
+                <p>v_rms = √(3RT/M)</p>
+                <p class="tip"><strong>Tip:</strong> Drag the container walls to change volume!</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn btn-secondary" id="preset1">
+                    <i class="fa-solid fa-snowflake"></i> Low Temp (100K)
+                </button>
+                <button class="btn btn-secondary" id="preset2">
+                    <i class="fa-solid fa-house"></i> Room Temp (298K)
+                </button>
+                <button class="btn btn-secondary" id="preset3">
+                    <i class="fa-solid fa-fire"></i> High Temp (600K)
+                </button>
+                <button class="btn btn-secondary" id="preset4">
+                    <i class="fa-solid fa-compress"></i> Compress Gas
+                </button>
+                <button class="btn btn-secondary" id="preset5">
+                    <i class="fa-solid fa-expand"></i> Expand Gas
+                </button>
+                <button class="btn btn-secondary" id="preset6">
+                    <i class="fa-solid fa-flask-vial"></i> Real Gas Demo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/gaslaws.js') }}"></script>
+</body>
+</html>
