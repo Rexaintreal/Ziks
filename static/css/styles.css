@@ -85,14 +85,34 @@ nav {
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
     font-size: 1.5rem;
     font-weight: 700;
+    
+}
+.logo-img {
+    height: 32px;
+    width: auto;
+    margin-right: 8px;
+    
 }
 
-.logo i {
-    font-size: 1.75rem;
-    color: var(--text);
+.light-logo {
+    display: none;
+}
+
+[data-theme="light"] .dark-logo {
+    display: none;
+}
+
+[data-theme="light"] .light-logo {
+    display: inline-block;
+}
+
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
 }
 
 .logo img {
@@ -100,10 +120,6 @@ nav {
     width: auto;
 }
 
-.logo svg {
-    fill: var(--text);
-    stroke: var(--text);
-}
 
 .nav-center {
     display: flex;

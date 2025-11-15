@@ -9,16 +9,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/logo.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/logo.ico') }}">
 </head>
 <body data-theme="dark">
     <nav>
         <div class="nav-left">
-            <div class="logo">
-                <i class="fa-solid fa-gear"></i>
-                <span>Ziks</span>
-            </div>
+            <a href="/" class="logo-link">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='assets/logo-dark.png') }}" class="logo-img dark-logo">
+                    <img src="{{ url_for('static', filename='assets/logo-light.png') }}" class="logo-img light-logo">
+                    <span>Ziks</span>
+                </div>
+            </a>
         </div>
-
         <div class="nav-center">
             <div class="dropdown">
                 <button class="dropbtn nav-link">
@@ -482,6 +486,37 @@
                 font-size: 1.1rem;
             }
         }
+        .footer {
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0); 
+        }
+
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+
     </style>
+<footer class="footer">
+    <p>
+        Made by 
+        <a href="https://saurabhcodesawfully.pythonanywhere.com/" target="_blank">
+            Saurabh Tiwari
+        </a>
+    </p>
+</footer>
+
 </body>
 </html>
