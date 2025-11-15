@@ -73,7 +73,7 @@
             <div class="dropdown">
                 <button class="dropbtn nav-link">
                     <i class="fa-solid fa-fire"></i>
-                    Heat & Thermo <i class="fa-solid fa-caret-down"></i>
+                    Heat & Thermodynamics <i class="fa-solid fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
                     <a href="/thermal"><i class="fa-solid fa-temperature-high"></i> Thermal Expansion</a>
@@ -98,7 +98,7 @@
 
     <div class="hero">
         <h1>Ziks Engine</h1>
-        <p>A physics simulator made for the Axiom YSWS visualize physics concepts using real simulations</p>
+        <p>A physics simulator made for the Axiom (HackClub YSWS) to visualize physics concepts using real simulations</p>
         
         <div class="hero-links">
             <a href="https://axiom.hackclub.com/" target="_blank" class="hero-link">
@@ -123,7 +123,7 @@
                 </svg>
             </div>
             <h3>Projectile Motion</h3>
-            <p>Change the angles, speed, and gravity to see your object launch like angry birds</p>
+            <p>Change the angles speed and gravity to see your object launch like angry birds (literally)</p>
         </a>
 
         <a href="/force" class="card">
@@ -146,7 +146,7 @@
                 </svg>
             </div>
             <h3>Pendulum</h3>
-            <p>Adjust length and gravity, and drag it to 360° to watch oscillations</p>
+            <p>Adjust length and gravity drag it to 360 degrees to watch oscillations</p>
         </a>
 
         <a href="/incline" class="card">
@@ -395,7 +395,6 @@
             position: relative;
             display: inline-block;
         }
-
         .dropbtn {
             background: none;
             border: none;
@@ -405,6 +404,16 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            padding: 0.5rem 0.75rem;
+            white-space: nowrap;
+        }
+        .nav-center {
+            display: flex;
+            gap: 1rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            flex-wrap: nowrap;
         }
 
         .dropdown-content {
@@ -415,6 +424,9 @@
             box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
             border-radius: 10px;
             z-index: 1;
+            margin-top: 0;
+            top: 100%; 
+            left: 0;
         }
 
         .dropdown-content a {
@@ -423,6 +435,12 @@
             display: block;
             text-decoration: none;
         }
+        .dropdown-content a:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+        .dropdown-content a:last-child {
+            border-radius: 0 0 10px 10px; 
+        }
 
         .dropdown-content a:hover {
             background-color: var(--card-hover);
@@ -430,6 +448,39 @@
 
         .dropdown:hover .dropdown-content {
             display: block;
+        }
+        .dropdown-content::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+        @media (max-width: 1200px) {
+            .dropbtn {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.6rem;
+                gap: 4px;
+            }
+            
+            .nav-center {
+                gap: 0.5rem;
+            }
+        }
+        @media (max-width: 1024px) {
+            .dropbtn {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.5rem;
+            }
+            
+            .dropbtn span {
+                display: none; 
+            }
+            
+            .dropbtn i:first-child {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </body>
