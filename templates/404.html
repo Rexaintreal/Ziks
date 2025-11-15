@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme if theme else 'dark' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Ziks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/logo.ico') }}">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="logo-link">
+                <img src="{{ url_for('static', filename='assets/logo-dark.png') }}" class="logo-img dark-logo">
+                <img src="{{ url_for('static', filename='assets/logo-light.png') }}" class="logo-img light-logo">
+                <span>Ziks</span>
+            </a>
+        </div>
+    </nav>
+
+    <section class="hero" style="padding-top: 8rem;">
+        <h1>404</h1>
+        <p>The page you’re looking for does not exist or has been moved.</p>
+
+        <div class="hero-links">
+            <a href="/" class="hero-link">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path d="M3 12l9-9 9 9M4 10v10h6v-6h4v6h6V10"/>
+                </svg>
+                Back to Home
+            </a>
+
+            <a href="/" class="hero-link">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Explore Simulators
+            </a>
+        </div>
+    </section>
+</body>
+</html>

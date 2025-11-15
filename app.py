@@ -98,6 +98,10 @@ def gaslaws():
 def photoelectric():
     return render_template('photoelectric.html')
 
+# ----------------- Error Handlers -----------------
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 # ----------------- Running the app -----------------
 if __name__ == '__main__':
