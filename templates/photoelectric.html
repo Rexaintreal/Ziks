@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photoelectric Effect - Ziks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/photoelectric.css') }}">
+</head>
+<body data-theme="dark">
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Photoelectric Effect... o((>ω< ))o</div>
+    </div>
+
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="back-btn" style="margin: 0;">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="sim-container">
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <span class="engine-title">Photoelectric Effect Simulator</span>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+                <div class="photon-counter" id="photonCounter">
+                    <div class="counter-item">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span id="photonCount">0</span>
+                        <small>Photons</small>
+                    </div>
+                    <div class="counter-item">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span id="electronCount">0</span>
+                        <small>Electrons</small>
+                    </div>
+                    <div class="counter-item">
+                        <i class="fa-solid fa-gauge"></i>
+                        <span id="currentValue">0.0</span>
+                        <small>nA</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3 style="color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem;">Controls</h3>
+
+            <div class="control-group">
+                <label>Metal Surface</label>
+                <div class="metal-buttons">
+                    <button class="btn-metal active" data-metal="sodium">
+                        Na<br><small>2.3 eV</small>
+                    </button>
+                    <button class="btn-metal" data-metal="potassium">
+                        K<br><small>2.0 eV</small>
+                    </button>
+                    <button class="btn-metal" data-metal="cesium">
+                        Cs<br><small>1.9 eV</small>
+                    </button>
+                    <button class="btn-metal" data-metal="zinc">
+                        Zn<br><small>4.3 eV</small>
+                    </button>
+                    <button class="btn-metal" data-metal="copper">
+                        Cu<br><small>4.7 eV</small>
+                    </button>
+                    <button class="btn-metal" data-metal="platinum">
+                        Pt<br><small>6.4 eV</small>
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Light Frequency (× 10¹⁴ Hz)</label>
+                <div class="slider-container">
+                    <input type="range" id="frequencySlider" min="3" max="15" value="7" step="0.1">
+                </div>
+                <div class="value-display frequency-display">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <span id="frequencyDisplay">7.0 × 10¹⁴ Hz</span>
+                    <div class="wavelength-indicator" id="wavelengthColor"></div>
+                </div>
+                <div class="wavelength-info">
+                    <span id="wavelengthDisplay">428 nm</span>
+                    <span id="colorName">Blue</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Light Intensity (W/m²)</label>
+                <div class="slider-container">
+                    <input type="range" id="intensitySlider" min="0" max="100" value="50" step="1">
+                </div>
+                <div class="value-display">
+                    <i class="fa-solid fa-sun"></i>
+                    <span id="intensityDisplay">50 W/m²</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Applied Voltage (V)</label>
+                <div class="slider-container">
+                    <input type="range" id="voltageSlider" min="-5" max="5" value="0" step="0.1">
+                </div>
+                <div class="value-display voltage-display">
+                    <i class="fa-solid fa-plug"></i>
+                    <span id="voltageDisplay">0.0 V</span>
+                </div>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showPhotons" checked>
+                    <span>Show Photon Beam</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showElectrons" checked>
+                    <span>Show Ejected Electrons</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showEnergyLevels">
+                    <span>Show Energy Diagram</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGraph" checked>
+                    <span>Show I-V Curve</span>
+                </label>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-action" id="lightOnBtn">
+                    <i class="fa-solid fa-lightbulb"></i> Turn Light ON
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <h4>Measurements</h4>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-sun"></i>
+                        Photon Energy (E)
+                    </span>
+                    <span class="stat-value" id="photonEnergyValue">2.9 eV</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-door-open"></i>
+                        Work Function (Φ)
+                    </span>
+                    <span class="stat-value" id="workFunctionValue">2.3 eV</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Max KE (K_max)
+                    </span>
+                    <span class="stat-value" id="maxKEValue">0.6 eV</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Stopping Potential (V₀)
+                    </span>
+                    <span class="stat-value" id="stoppingPotentialValue">0.6 V</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">
+                        <i class="fa-solid fa-plug-circle-bolt"></i>
+                        Photocurrent (I)
+                    </span>
+                    <span class="stat-value" id="photocurrentValue">50 nA</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fa-solid fa-atom"></i> Einstein's Equation</h4>
+                <p><strong>Photoelectric Effect:</strong></p>
+                <p>E = hν = Φ + K_max</p>
+                <p><strong>Where:</strong></p>
+                <p>• E = Photon energy (hν)</p>
+                <p>• Φ = Work function</p>
+                <p>• K_max = Maximum kinetic energy</p>
+                <p><strong>Stopping Potential:</strong></p>
+                <p>eV₀ = K_max = hν - Φ</p>
+                <p class="tip"><strong>Tip:</strong> Try different metals and frequencies!</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn btn-secondary" id="preset1">
+                    <i class="fa-solid fa-circle" style="color: #ff0000;"></i> Red Light
+                </button>
+                <button class="btn btn-secondary" id="preset2">
+                    <i class="fa-solid fa-circle" style="color: #00ff00;"></i> Green Light
+                </button>
+                <button class="btn btn-secondary" id="preset3">
+                    <i class="fa-solid fa-circle" style="color: #0000ff;"></i> Blue Light
+                </button>
+                <button class="btn btn-secondary" id="preset4">
+                    <i class="fa-solid fa-circle" style="color: #9400d3;"></i> UV Light
+                </button>
+                <button class="btn btn-secondary" id="preset5">
+                    <i class="fa-solid fa-flask"></i> Threshold Demo
+                </button>
+                <button class="btn btn-secondary" id="preset6">
+                    <i class="fa-solid fa-bolt"></i> Max KE Demo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/photoelectric.js') }}"></script>
+</body>
+</html>
