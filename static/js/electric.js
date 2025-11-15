@@ -11,6 +11,7 @@ let showForce = false;
 let animateTest = false;
 let testChargePos = null;
 let testChargeVel = { x: 0, y: 0 };
+let testChargeTrail = [];
 let zoom = 1;
 let panX = 0;
 let panY = 0;
@@ -21,9 +22,10 @@ let draggedTest = false;
 let nextChargeType = 'positive';
 let cursorPos = { x: 0, y: 0 };
 let isAnimating = false;
-// const
-const k = 1;
+const k = 8.99; //colombs const
 const pixelsToMeters = 100; 
+const testChargeMass = 1; 
+const dampingFactor = 0.985;
 
 window.addEventListener('load', () => {
     setTimeout(() => {
@@ -39,7 +41,6 @@ function resizeCanvas() {
     canvas.width = wrapper.clientWidth;
     canvas.height = wrapper.clientHeight;
     
-    // init test charge if not set
     if (!testChargePos) {
         testChargePos = { 
             x: canvas.width / (2 * zoom), 
@@ -53,7 +54,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// controls
+//getcontrol
 const vizModeSelect = document.getElementById('vizMode');
 const addPositiveBtn = document.getElementById('addPositive');
 const addNegativeBtn = document.getElementById('addNegative');
@@ -123,6 +124,9 @@ showChargesCheck.addEventListener('change', () => {
 
 showTestChargeCheck.addEventListener('change', () => {
     showTestCharge = showTestChargeCheck.checked;
+    if (!showTestCharge) {
+        testChargeTrail = [];
+    }
     draw();
 });
 
@@ -133,15 +137,22 @@ showForceCheck.addEventListener('change', () => {
 
 animateTestCheck.addEventListener('change', () => {
     animateTest = animateTestCheck.checked;
-    if (animateTest && !isAnimating) {
-        isAnimating = true;
-        animate();
+    if (!animateTest) {
+        testChargeTrail = [];
+        isAnimating = false;
+    } else {
+        if (!isAnimating) {
+            isAnimating = true;
+            requestAnimationFrame(animate);
+        }
     }
+    draw();
 });
 
 clearBtn.addEventListener('click', () => {
     charges = [];
     testChargeVel = { x: 0, y: 0 };
+    testChargeTrail = [];
     updateStats();
     draw();
 });
@@ -153,11 +164,11 @@ presetBtn.addEventListener('click', () => {
         { x: centerX - 150, y: centerY, charge: 8 },
         { x: centerX + 150, y: centerY, charge: -8 }
     ];
+    testChargeTrail = [];
     updateStats();
     draw();
 });
 
-// zoom
 function updateZoomDisplay() {
     if (zoomDisplay) {
         zoomDisplay.textContent = `${Math.round(zoom * 100)}%`;
@@ -196,7 +207,6 @@ function getCanvasCoords(e) {
     };
 }
 
-// mouse stuff
 canvas.addEventListener('mousedown', (e) => {
     const mouse = getCanvasCoords(e);
     if (showTestCharge && testChargePos) {
@@ -234,6 +244,7 @@ canvas.addEventListener('mousemove', (e) => {
     if (draggedTest) {
         testChargePos = { x: mouse.x, y: mouse.y };
         testChargeVel = { x: 0, y: 0 };
+        testChargeTrail = [];
         draw();
     } else if (draggedCharge !== null) {
         charges[draggedCharge].x = mouse.x;
@@ -277,7 +288,6 @@ canvas.addEventListener('mouseleave', () => {
 canvas.addEventListener('dblclick', (e) => {
     const mouse = getCanvasCoords(e);
     
-    // remove charge on double click
     for (let i = charges.length - 1; i >= 0; i--) {
         const charge = charges[i];
         const dist = Math.sqrt((mouse.x - charge.x) ** 2 + (mouse.y - charge.y) ** 2);
@@ -290,8 +300,6 @@ canvas.addEventListener('dblclick', (e) => {
         }
     }
 });
-
-// calculate field at a point main physics calc
 function getElectricField(x, y) {
     let Ex = 0, Ey = 0;
     
@@ -300,10 +308,8 @@ function getElectricField(x, y) {
         const dy = y - charge.y;
         const rSquared = dx * dx + dy * dy;
         const r = Math.sqrt(rSquared);
-        
-        if (r < 3) continue; // too close to charge
-        
-        // E = kQ/rsquare in direction of r
+        const minDist = Math.abs(charge.charge) * 2.5 + 8;
+        if (r < minDist) continue;
         const E = k * charge.charge / rSquared;
         Ex += E * (dx / r);
         Ey += E * (dy / r);
@@ -317,7 +323,6 @@ function getElectricField(x, y) {
     };
 }
 
-// get potential at point
 function getPotential(x, y) {
     let V = 0;
     
@@ -326,7 +331,8 @@ function getPotential(x, y) {
         const dy = y - charge.y;
         const r = Math.sqrt(dx * dx + dy * dy);
         
-        if (r < 3) continue;
+        const minDist = Math.abs(charge.charge) * 2.5 + 8;
+        if (r < minDist) continue;
         
         V += k * charge.charge / r;
     }
@@ -362,17 +368,15 @@ function getThemeColors() {
         testCharge: isDark ? '#da77f2' : '#9c36b5',
         force: isDark ? '#ff922b' : '#fd7e14',
         text: isDark ? '#ffffff' : '#000000',
-        vector: isDark ? '#51cf66' : '#2f9e44'
+        vector: isDark ? '#51cf66' : '#2f9e44',
+        trail: isDark ? '#da77f2' : '#9c36b5'
     };
 }
-
-// trace field line from start point
 function traceFieldLine(startX, startY, direction) {
     const points = [];
     let x = startX;
     let y = startY;
-    const stepSize = 2;
-    const maxSteps = 800;
+    const maxSteps = 1000;
     
     for (let i = 0; i < maxSteps; i++) {
         const field = getElectricField(x, y);
@@ -380,16 +384,18 @@ function traceFieldLine(startX, startY, direction) {
         if (field.magnitude < 0.01) break;
         
         points.push({ x, y });
+        const stepSize = Math.max(1.5, Math.min(3, 50 / field.magnitude));
+        
         const norm = field.magnitude;
         x += direction * stepSize * field.Ex / norm;
         y += direction * stepSize * field.Ey / norm;
-        if (x < -50 || x > canvas.width/zoom + 50 || y < -50 || y > canvas.height/zoom + 50) break;
         
-        // check if we hit a negative charge so the field lines end there
+        if (x < -50 || x > canvas.width/zoom + 50 || y < -50 || y > canvas.height/zoom + 50) break;
         let hitCharge = false;
         for (let charge of charges) {
             const dist = Math.sqrt((x - charge.x) ** 2 + (y - charge.y) ** 2);
-            if (dist < Math.abs(charge.charge) * 3) {
+            const chargeRadius = Math.abs(charge.charge) * 2.5 + 10;
+            if (dist < chargeRadius) {
                 if ((direction > 0 && charge.charge < 0) || (direction < 0 && charge.charge > 0)) {
                     hitCharge = true;
                     break;
@@ -429,8 +435,6 @@ function draw() {
         ctx.lineTo(canvas.width/zoom, y);
         ctx.stroke();
     }
-    
-    // draw visualization based on mode
     if (charges.length > 0) {
         if (vizMode === 'field') {
             drawFieldLines(colors);
@@ -442,13 +446,29 @@ function draw() {
             drawHeatmap(colors);
         }
     }
-    
-    // draw charges
+    if (showTestCharge && testChargeTrail.length > 1) {
+        ctx.strokeStyle = colors.trail + '80';
+        ctx.lineWidth = 2/zoom;
+        ctx.beginPath();
+        ctx.moveTo(testChargeTrail[0].x, testChargeTrail[0].y);
+        for (let i = 1; i < testChargeTrail.length; i++) {
+            ctx.lineTo(testChargeTrail[i].x, testChargeTrail[i].y);
+        }
+        ctx.stroke();
+        for (let i = 0; i < testChargeTrail.length; i += 3) {
+            const alpha = Math.floor((i / testChargeTrail.length) * 200 + 55).toString(16).padStart(2, '0');
+            ctx.fillStyle = colors.trail + alpha;
+            ctx.beginPath();
+            ctx.arc(testChargeTrail[i].x, testChargeTrail[i].y, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
     if (showCharges) {
         for (let charge of charges) {
             const isPositive = charge.charge > 0;
             const radius = Math.abs(charge.charge) * 2.5 + 10;
             const color = isPositive ? colors.positive : colors.negative;
+            
             const gradient = ctx.createRadialGradient(charge.x, charge.y, 0, charge.x, charge.y, radius * 1.8);
             gradient.addColorStop(0, color + '40');
             gradient.addColorStop(1, color + '00');
@@ -456,15 +476,16 @@ function draw() {
             ctx.beginPath();
             ctx.arc(charge.x, charge.y, radius * 1.8, 0, Math.PI * 2);
             ctx.fill();
+            
             ctx.fillStyle = color;
             ctx.beginPath();
             ctx.arc(charge.x, charge.y, radius, 0, Math.PI * 2);
             ctx.fill();
+            
             ctx.strokeStyle = colors.text + '80';
             ctx.lineWidth = 2/zoom;
             ctx.stroke();
             
-            // + or - symbol
             ctx.fillStyle = colors.text;
             ctx.font = `bold ${Math.min(radius * 1.2, 24)/zoom}px Inter`;
             ctx.textAlign = 'center';
@@ -474,11 +495,10 @@ function draw() {
             ctx.fillText(Math.abs(charge.charge).toFixed(1) + 'μC', charge.x, charge.y + radius + 15);
         }
     }
-    
-    // test charge
     if (showTestCharge && testChargePos) {
         const radius = 12;
         const color = colors.testCharge;
+        
         const gradient = ctx.createRadialGradient(testChargePos.x, testChargePos.y, 0, testChargePos.x, testChargePos.y, radius * 2);
         gradient.addColorStop(0, color + '60');
         gradient.addColorStop(1, color + '00');
@@ -495,16 +515,18 @@ function draw() {
         ctx.strokeStyle = colors.text;
         ctx.lineWidth = 2/zoom;
         ctx.stroke();
+        
         ctx.fillStyle = colors.text;
         ctx.font = `${10/zoom}px Inter`;
         ctx.textAlign = 'center';
         ctx.fillText('test', testChargePos.x, testChargePos.y);
+        
         if (showForce) {
             const field = getElectricField(testChargePos.x, testChargePos.y);
-            const forceMag = field.magnitude * Math.abs(testCharge) / 10;
+            const forceMag = field.magnitude * Math.abs(testCharge);
             
             if (forceMag > 0.01) {
-                const arrowLen = Math.min(forceMag * 20, 100);
+                const arrowLen = Math.min(forceMag * 15, 120);
                 const sign = testCharge >= 0 ? 1 : -1;
                 const arrowX = testChargePos.x + sign * (field.Ex / field.magnitude) * arrowLen;
                 const arrowY = testChargePos.y + sign * (field.Ey / field.magnitude) * arrowLen;
@@ -531,7 +553,6 @@ function draw() {
 }
 
 function drawFieldLines(colors) {
-    // draw field lines from each positive charge
     for (let charge of charges) {
         if (charge.charge <= 0) continue;
         
@@ -546,13 +567,21 @@ function drawFieldLines(colors) {
             const points = traceFieldLine(startX, startY, 1);
             
             if (points.length > 5) {
-                ctx.strokeStyle = colors.fieldLine + 'C0';
+                const gradient = ctx.createLinearGradient(points[0].x, points[0].y, 
+                    points[points.length-1].x, points[points.length-1].y);
+                gradient.addColorStop(0, colors.fieldLine + 'D0');
+                gradient.addColorStop(1, colors.fieldLine + '60');
+                
+                ctx.strokeStyle = gradient;
                 ctx.lineWidth = 1.5/zoom;
                 ctx.beginPath();
                 ctx.moveTo(points[0].x, points[0].y);
-                for (let j = 1; j < points.length; j++) {
-                    ctx.lineTo(points[j].x, points[j].y);
+                for (let j = 1; j < points.length - 2; j += 2) {
+                    const xc = (points[j].x + points[j + 1].x) / 2;
+                    const yc = (points[j].y + points[j + 1].y) / 2;
+                    ctx.quadraticCurveTo(points[j].x, points[j].y, xc, yc);
                 }
+                ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
                 ctx.stroke();
                 if (points.length > 20) {
                     const midIdx = Math.floor(points.length / 2);
@@ -581,7 +610,6 @@ function drawVectorField(colors) {
             const field = getElectricField(x, y);
             
             if (field.magnitude < 0.05) continue;
-            // logarithmic scaling for better visualization
             const maxLen = spacing * 0.45;
             const scaledMag = Math.log10(field.magnitude + 1) * 10;
             const len = Math.min(scaledMag, maxLen);
@@ -607,11 +635,11 @@ function drawVectorField(colors) {
     }
 }
 
+
+
 function drawEquipotentials(colors) {
-    const resolution = 6;
-    const potentialLevels = new Set();
+    const resolution = 5;
     
-    // first pass - find potential range
     let minV = Infinity, maxV = -Infinity;
     for (let x = 0; x < canvas.width/zoom; x += resolution * 3) {
         for (let y = 0; y < canvas.height/zoom; y += resolution * 3) {
@@ -622,18 +650,20 @@ function drawEquipotentials(colors) {
             }
         }
     }
+    
+    const levelSpacing = (maxV - minV) / 20;
+    if (levelSpacing === 0) return;
+    
     for (let x = 0; x < canvas.width/zoom; x += resolution) {
         for (let y = 0; y < canvas.height/zoom; y += resolution) {
             const V = getPotential(x, y);
-            const levelSpacing = (maxV - minV) / 15;
-            if (levelSpacing === 0) continue;
-            
             const level = Math.round(V / levelSpacing);
             const targetV = level * levelSpacing;
             
-            if (Math.abs(V - targetV) < levelSpacing * 0.15) {
-                const intensity = Math.abs((V - minV) / (maxV - minV));
-                const alpha = Math.floor(intensity * 200 + 55).toString(16).padStart(2, '0');
+            if (Math.abs(V - targetV) < levelSpacing * 0.12) {
+                const normalized = (V - minV) / (maxV - minV);
+                const intensity = Math.abs(normalized);
+                const alpha = Math.floor(intensity * 180 + 75).toString(16).padStart(2, '0');
                 
                 ctx.fillStyle = colors.equipotential + alpha;
                 ctx.fillRect(x, y, resolution, resolution);
@@ -642,10 +672,11 @@ function drawEquipotentials(colors) {
     }
 }
 
+
+
+
 function drawHeatmap(colors) {
-    const resolution = 10;
-    
-    // find max field for normalization
+    const resolution = 8;
     let maxField = 0;
     for (let x = 0; x < canvas.width/zoom; x += resolution * 2) {
         for (let y = 0; y < canvas.height/zoom; y += resolution * 2) {
@@ -676,46 +707,85 @@ function drawHeatmap(colors) {
 }
 
 function animate() {
-    if (!animateTest || !showTestCharge || !testChargePos) {
+    if (!animateTest || !showTestCharge) {
         isAnimating = false;
         return;
     }
     
-    const dt = 0.02;
+    if (!testChargePos) {
+        testChargePos = { 
+            x: canvas.width / (2 * zoom), 
+            y: canvas.height / (2 * zoom) 
+        };
+    }
     
-    // get field at test charge position
+    const dt = 0.016;
     const field = getElectricField(testChargePos.x, testChargePos.y);
     const sign = testCharge >= 0 ? 1 : -1;
-    const forceX = sign * field.Ex * Math.abs(testCharge) * 0.1;
-    const forceY = sign * field.Ey * Math.abs(testCharge) * 0.1;
-    testChargeVel.x += forceX * dt;
-    testChargeVel.y += forceY * dt;
-    testChargeVel.x *= 0.98; 
-    testChargeVel.y *= 0.98;
-    const maxSpeed = 50;
+    const forceX = sign * field.Ex * Math.abs(testCharge);
+    const forceY = sign * field.Ey * Math.abs(testCharge);
+    const accelerationX = forceX / testChargeMass;
+    const accelerationY = forceY / testChargeMass;
+    testChargeVel.x += accelerationX * dt;
+    testChargeVel.y += accelerationY * dt;
+    testChargeVel.x *= dampingFactor;
+    testChargeVel.y *= dampingFactor;
+    const maxSpeed = 80;
     const speed = Math.sqrt(testChargeVel.x ** 2 + testChargeVel.y ** 2);
     if (speed > maxSpeed) {
         testChargeVel.x = (testChargeVel.x / speed) * maxSpeed;
         testChargeVel.y = (testChargeVel.y / speed) * maxSpeed;
     }
-    testChargePos.x += testChargeVel.x * dt;
-    testChargePos.y += testChargeVel.y * dt;
+    let willCollide = false;
+    const nextX = testChargePos.x + testChargeVel.x * dt;
+    const nextY = testChargePos.y + testChargeVel.y * dt;
+    
+    for (let charge of charges) {
+        const dx = nextX - charge.x;
+        const dy = nextY - charge.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = Math.abs(charge.charge) * 2.5 + 15;
+        
+        if (dist < minDist) {
+            willCollide = true;
+            const nx = dx / dist; 
+            const ny = dy / dist;
+            const dotProduct = testChargeVel.x * nx + testChargeVel.y * ny;
+            testChargeVel.x = testChargeVel.x - 2 * dotProduct * nx;
+            testChargeVel.y = testChargeVel.y - 2 * dotProduct * ny;
+            testChargeVel.x *= 0.6;
+            testChargeVel.y *= 0.6;
+            const pushDist = minDist - dist + 2;
+            testChargePos.x += nx * pushDist;
+            testChargePos.y += ny * pushDist;
+            
+            break;
+        }
+    }
+    if (!willCollide) {
+        testChargePos.x += testChargeVel.x * dt;
+        testChargePos.y += testChargeVel.y * dt;
+    }
     const margin = 30;
     if (testChargePos.x < margin) {
         testChargePos.x = margin;
-        testChargeVel.x *= -0.7;
+        testChargeVel.x = Math.abs(testChargeVel.x) * 0.7;
     }
     if (testChargePos.x > canvas.width/zoom - margin) {
         testChargePos.x = canvas.width/zoom - margin;
-        testChargeVel.x *= -0.7;
+        testChargeVel.x = -Math.abs(testChargeVel.x) * 0.7;
     }
     if (testChargePos.y < margin) {
         testChargePos.y = margin;
-        testChargeVel.y *= -0.7;
+        testChargeVel.y = Math.abs(testChargeVel.y) * 0.7;
     }
     if (testChargePos.y > canvas.height/zoom - margin) {
         testChargePos.y = canvas.height/zoom - margin;
-        testChargeVel.y *= -0.7;
+        testChargeVel.y = -Math.abs(testChargeVel.y) * 0.7;
+    }
+    testChargeTrail.push({ x: testChargePos.x, y: testChargePos.y });
+    if (testChargeTrail.length > 150) {
+        testChargeTrail.shift();
     }
     
     draw();
@@ -727,7 +797,6 @@ function animate() {
     }
 }
 
-// init
 setTimeout(() => {
     updateZoomDisplay();
     addPositiveBtn.classList.add('active');
