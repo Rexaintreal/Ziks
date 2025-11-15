@@ -31,9 +31,9 @@ The Demo video where I go through all 21 simulations running locally and some ot
 
 ---
 
-## Try it (ITS LIVE!!)
+## Try it (ITS LIVE)
 
-Ziks is hosted on [Pythonanywhere](pythonanywhere.com) and you can visit it at [LINK](https://ziks.pythonanywhere.com/)
+Ziks is hosted on pythonanywhere and you can visit it at [LINK](https://ziks.pythonanywhere.com/)
 
 ## Features
 
