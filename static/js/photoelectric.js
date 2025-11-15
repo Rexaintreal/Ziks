@@ -1,10 +1,10 @@
 //consts
 const h = 6.626e-34; //planks const
-const c = 3e8; //speed of light
-const e = 1.602e-19; // charge
-const eV_to_J = 1.602e-19; // conversion
+const c = 3e8; //light speed
+const e = 1.602e-19; //charge
+const eV_to_J = 1.602e-19; //conversion fact
 
-// init metals and  work functions
+//init metals with work fx
 const metals = {
     sodium: { name: 'Sodium (Na)', workFunction: 2.3, color: '#ffd43b' },
     potassium: { name: 'Potassium (K)', workFunction: 2.0, color: '#ff922b' },
@@ -14,7 +14,7 @@ const metals = {
     platinum: { name: 'Platinum (Pt)', workFunction: 6.4, color: '#c0c0c0' }
 };
 let currentMetal = 'sodium';
-let frequency = 7e14;
+let frequency = 7e14; 
 let intensity = 50; 
 let appliedVoltage = 0; 
 let isLightOn = false;
@@ -140,28 +140,28 @@ document.getElementById('resetBtn')?.addEventListener('click', () => {
 });
 
 document.getElementById('preset1')?.addEventListener('click', () => {
-    frequency = 4.5e14; // Red
+    frequency = 4.5e14;
     frequencySlider.value = 4.5;
     calculatePhysics();
     updateDisplay();
 });
 
 document.getElementById('preset2')?.addEventListener('click', () => {
-    frequency = 5.5e14; // Green
+    frequency = 5.5e14; 
     frequencySlider.value = 5.5;
     calculatePhysics();
     updateDisplay();
 });
 
 document.getElementById('preset3')?.addEventListener('click', () => {
-    frequency = 6.5e14; // Blue
+    frequency = 6.5e14; 
     frequencySlider.value = 6.5;
     calculatePhysics();
     updateDisplay();
 });
 
 document.getElementById('preset4')?.addEventListener('click', () => {
-    frequency = 10e14; // UV
+    frequency = 10e14;
     frequencySlider.value = 10;
     calculatePhysics();
     updateDisplay();
@@ -188,7 +188,7 @@ document.getElementById('preset6')?.addEventListener('click', () => {
 });
 
 function frequencyToWavelength(freq) {
-    return (c / freq) * 1e9; 
+    return (c / freq) * 1e9;
 }
 
 function wavelengthToRGB(wavelength) {
@@ -259,14 +259,11 @@ function getColorName(wavelength) {
 
 function calculatePhysics() {
     const metal = metals[currentMetal];
-    
-    //photon energy E = hν electorn voltz
+    //photon energy E = hν 
     photonEnergy = (h * frequency) / eV_to_J;
-    
-    //max KE maxK = hν - workfx
+    // max KE maxK = hν - workFunction
     maxKE = photonEnergy - metal.workFunction;
-    
-    //stopp poten eVnot = Kmax
+    //stopping pot Evnot = Kmax
     stoppingPotential = maxKE;
     if (maxKE > 0 && appliedVoltage >= -stoppingPotential) {
         photocurrent = intensity * (1 - Math.abs(appliedVoltage / (stoppingPotential + 1)));
@@ -338,9 +335,8 @@ function createPhoton() {
 function createElectron(y) {
     const metal = metals[currentMetal];
     
-    // electron vel based on kinetic energy
-    // KE = 1/2mv2  v = root(2KE/m)
-    const electronMass = 9.109e-31; 
+    //KE = 1/2mv2 v = root(2KE/m)
+    const electronMass = 9.109e-31;
     const ke_J = maxKE * eV_to_J;
     const velocity = Math.sqrt(2 * ke_J / electronMass);
     const visualSpeed = 3 + (maxKE / 5) * 2;
@@ -372,20 +368,19 @@ function updatePhysics() {
             if (maxKE > 0 && Math.random() < 0.7) {
                 createElectron(p.y);
             }
-            return false;
+            return false; 
         }
         
         return p.x < canvas.width;
     });
-    
     electrons = electrons.filter(e => {
         e.x += e.vx;
         e.y += e.vy;
         e.life--;
         e.vx += e.fieldEffect * 0.01;
         if (appliedVoltage < 0 && Math.abs(appliedVoltage) >= stoppingPotential) {
-            e.vx *= 0.95; 
-            if (e.vx < 0.1) return false;
+            e.vx *= 0.95; // Slow down
+            if (e.vx < 0.1) return false; 
         }
         
         return e.x < canvas.width && e.life > 0;
@@ -422,7 +417,6 @@ function draw() {
     gradient.addColorStop(1, colors.metal);
     ctx.fillStyle = gradient;
     ctx.fillRect(metalX, metalY, metalWidth, metalHeight);
-    
     ctx.strokeStyle = colors.border;
     ctx.lineWidth = 2;
     ctx.strokeRect(metalX, metalY, metalWidth, metalHeight);
@@ -495,7 +489,6 @@ function draw() {
     if (isLightOn) {
         const wavelength = frequencyToWavelength(frequency);
         const lightColor = wavelengthToRGB(wavelength);
-        
         ctx.fillStyle = lightColor;
         ctx.shadowBlur = 30;
         ctx.shadowColor = lightColor;
@@ -536,11 +529,8 @@ function drawEnergyDiagram(colors) {
     ctx.font = 'bold 12px Inter';
     ctx.textAlign = 'center';
     ctx.fillText('Energy Diagram', diagramX + diagramWidth / 2, diagramY + 20);
-    
     const metal = metals[currentMetal];
     const scale = 20;
-    
-    // fermi lvl
     const fermiY = diagramY + diagramHeight - 30;
     ctx.strokeStyle = colors.metal;
     ctx.lineWidth = 3;
@@ -548,12 +538,10 @@ function drawEnergyDiagram(colors) {
     ctx.moveTo(diagramX + 20, fermiY);
     ctx.lineTo(diagramX + diagramWidth - 20, fermiY);
     ctx.stroke();
-    
     ctx.fillStyle = colors.text;
     ctx.font = '10px Inter';
     ctx.textAlign = 'left';
     ctx.fillText(`Φ = ${metal.workFunction} eV`, diagramX + 25, fermiY - 5);
-    
     if (photonEnergy > 0) {
         const photonY = fermiY - photonEnergy * scale;
         ctx.strokeStyle = wavelengthToRGB(frequencyToWavelength(frequency));
@@ -563,7 +551,6 @@ function drawEnergyDiagram(colors) {
         ctx.lineTo(diagramX + diagramWidth - 20, photonY);
         ctx.stroke();
         ctx.setLineDash([]);
-        
         ctx.fillText(`E = ${photonEnergy.toFixed(2)} eV`, diagramX + 25, photonY - 5);
         ctx.strokeStyle = colors.text;
         ctx.fillStyle = colors.text;
@@ -590,8 +577,6 @@ function drawIVGraph(colors) {
     const graphY = canvas.height - 180;
     const graphWidth = 250;
     const graphHeight = 150;
-    
-    
     ctx.fillStyle = colors.bg;
     ctx.strokeStyle = colors.border;
     ctx.lineWidth = 2;
@@ -602,7 +587,6 @@ function drawIVGraph(colors) {
     ctx.font = 'bold 12px Inter';
     ctx.textAlign = 'center';
     ctx.fillText('I-V Characteristic', graphX + graphWidth / 2, graphY + 20);
-    
     ctx.strokeStyle = colors.border;
     ctx.lineWidth = 1;
     const originX = graphX + 50;
@@ -619,7 +603,7 @@ function drawIVGraph(colors) {
         ctx.beginPath();
         
         const xScale = (graphWidth - 70) / 10; 
-        const yScale = (graphHeight - 60) / 100;
+        const yScale = (graphHeight - 60) / 100; 
         
         let started = false;
         graphData.forEach(point => {
@@ -652,8 +636,6 @@ function drawIVGraph(colors) {
         }
     }
     
-
-
     ctx.fillStyle = colors.text;
     ctx.font = '10px Inter';
     ctx.textAlign = 'center';
@@ -664,10 +646,6 @@ function drawIVGraph(colors) {
     ctx.fillText('Current (nA)', 0, 0);
     ctx.restore();
 }
-
-
-
-
 
 function adjustBrightness(color, factor) {
     const hex = color.replace('#', '');
@@ -682,10 +660,6 @@ function animate() {
     draw();
     requestAnimationFrame(animate);
 }
-
-
-
-
 
 setTimeout(() => {
     calculatePhysics();
