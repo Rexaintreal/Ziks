@@ -859,7 +859,6 @@ function animate() {
         block.position.y += block.velocity.y * dt * 50;
         
         // Check surface collision
-        const angleRad = surfaceAngle * Math.PI / 180;
         const surfaceY = block.position.x * Math.tan(angleRad);
         
 
