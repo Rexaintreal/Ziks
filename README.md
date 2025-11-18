@@ -33,7 +33,7 @@ The Demo video where I go through all 21 simulations running locally and some ot
 
 ## Try it (ITS LIVE)
 
-Ziks is hosted on pythonanywhere and you can visit it at [LINK](https://ziks.pythonanywhere.com/) **There seeems to be an Cloudflare Outage or maybe some internal stuff in Pythonanywhere so the south asian servers are not up rn if you can't access this please contact me or use TOR/VPN)**
+Ziks is hosted on pythonanywhere and you can visit it at [LINK](https://ziks.pythonanywhere.com/) **There seems to be an Cloudflare Outage or maybe some internal stuff at Pythonanywhere so the south asian and the american servers are not UP rn if you can't access this please contact me or use TOR/VPN)**
 
 ## Features
 
